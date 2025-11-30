@@ -1,0 +1,1633 @@
+/* ======================================================================
+   RESET & BASE
+   ====================================================================== */
+* { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  display: flex;
+}
+
+body.light { background-color: #F3F4F6; color: #111315; }
+body.dark  { background-color: #121212; color: #fff; }
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid #101010;
+  outline-offset: 2px;
+  border-color: #101010;
+  box-shadow: 0 0 0 2px rgba(16, 16, 16, 0.12);
+}
+
+/* ======================================================================
+   VARIABILI
+   ====================================================================== */
+:root{
+  /* Pagina */
+  --page-width: 900px;
+  --page-height: 1122px;
+  --page-padding: 72px 88px;
+
+  /* Sidebar */
+  --sidebar-w: 220px;
+  --accent-dark: #8ab4f8;
+  --accent-light:#1a73e8;
+
+  /* Timeline */
+  --tl-zoom: 1;
+  --tl-gap: 46px;
+  --ev-stack-gap: 46px;
+
+  /* Card timeline */
+  --ev-desc-lines: 4;
+  --ev-desc-edit-maxh: 220px;
+
+  /* PATCH custom fields */
+  --ctrl-size: 26px;
+  --ctrl-gap: 6px;
+  --drag-handle-w: 14px;
+}
+
+/* ======================================================================
+   TOGGLE SIDEBAR (sempre visibile, centrato)
+   ====================================================================== */
+#sidebarToggle{
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1200;
+  height: 36px;
+  width: 28px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: #bbb;
+  cursor: pointer;
+  transition: left .25s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#sidebarToggle:hover{
+  background: rgba(255,255,255,0.14);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+body.light #sidebarToggle{ background: rgba(0,0,0,0.06); color:#444; }
+body.light #sidebarToggle:hover{ background: rgba(0,0,0,0.12); }
+
+/* Freccia visuale (⟨ / ⟩) */
+#layoutRoot[data-sidebar-state="open"]  #sidebarToggle::after{ content:'⟨'; font-size:16px; line-height:1; }
+#layoutRoot[data-sidebar-state="closed"] #sidebarToggle::after{ content:'⟩'; font-size:16px; line-height:1; }
+
+/* Posizione orizzontale del toggle in base allo stato */
+#layoutRoot[data-sidebar-state="open"]  #sidebarToggle{ left: calc(var(--sidebar-w) - 10px); }
+#layoutRoot[data-sidebar-state="closed"] #sidebarToggle{ left: 10px; }
+
+/* ======================================================================
+   SIDEBAR (con header solo titolo)
+   ====================================================================== */
+.sidebar {
+  width: var(--sidebar-w);
+  background-color: #222;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;          /* <<< importante */
+  gap: 12px;
+  transition: width .25s ease, padding .25s ease;
+  will-change: width, padding;
+  position: relative;
+  overflow: hidden;
+}
+.sidebar h2 { margin-top: 0; font-size: 20px; }
+
+/* -------- ORDINAMENTO FLEX: pulsanti principali in alto -------- */
+/* Struttura DOM: header, .sections-split, #sectionsMenu, #sidebarActions, #sectionButtons */
+.sidebar > .sections-split { order: 10; width: 100%; }
+.sidebar > #sectionsMenu   { order: 11; width: 100%; }
+.sidebar > #sidebarActions { order: 12; flex: 0 0 auto; width: 100%; }
+.sidebar > #sectionButtons { order: 20; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+/* Allinea tutti i blocchi (eccetto header) alla stessa larghezza */
+.sidebar > *:not(.sidebar-header){
+  align-self: stretch;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar button {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 15px;
+  width: 100%;
+  text-align: left;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .08s ease;
+}
+.sidebar button:hover { background-color: #555; }
+
+/* le sezioni possono scrollare */
+#sectionButtons{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* gruppo pulsanti in basso (portati in alto con l’ordine) */
+#sidebarActions{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Header progetto: solo nome */
+.sidebar-header{
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:8px; position:relative;
+}
+.project-name{
+  font-weight:700; font-size:16px; line-height:1;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:140px;
+}
+
+/* Bottoni sidebar con icona inline (per "Torna al menu") */
+.sidebar button.btn-with-icon{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar button .icon{
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ===== Split button: Esporta (solo UI) ===== */
+.sidebar .export-split{
+  position: relative;
+  display: flex;
+  width: 100%;
+  gap: 0;
+}
+
+.sidebar #exportMainBtn{
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar .split-caret{
+  width: 42px;
+  padding: 0 10px;
+  background-color: #444;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .08s ease;
+}
+.sidebar .split-caret:hover{ background-color: #555; }
+.sidebar .split-caret .icon{
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Menu a tendina Export (overlay) */
+#exportMenu[hidden]{ display: none !important; }
+#exportMenu{
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 6px);
+  background: #2a2a2a;
+  color: inherit;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+  z-index: 1500;
+}
+
+body.light #exportMenu{
+  background:#FFFFFF; color:#111315;
+  border-color:#E5E7EB;
+  box-shadow:0 10px 24px rgba(0,0,0,0.12);
+}
+body.light #exportMenu .menu-item:hover{ background:rgba(0,0,0,0.04); }
+
+
+#exportMenu .menu-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: inherit;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color .15s ease, transform .06s ease;
+}
+#exportMenu .menu-item:hover{ background: rgba(127,127,127,0.14); }
+body.light #exportMenu .menu-item:hover{ background: rgba(0,0,0,0.06); }
+#exportMenu .menu-item:active{ transform: translateY(0.5px); }
+
+#exportMainBtn[aria-expanded="true"],
+#exportMenuToggle[aria-expanded="true"]{
+  box-shadow: 0 0 0 2px rgba(127,127,127,0.25) inset;
+}
+
+/* Evidenziazione sezione attiva */
+.sidebar button.is-active{
+  position: relative;
+  background: linear-gradient(to right, rgba(127,127,127,0.22), rgba(127,127,127,0.18));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+}
+body.light .sidebar button.is-active{
+  background: linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0.06));
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.22);
+}
+.sidebar button.is-active::before{ content: none; }
+
+
+/* Stato tendina: barra chiusa = nessuno spazio occupato */
+#layoutRoot[data-sidebar-state="open"]  #sidebar{
+  width: var(--sidebar-w);
+  padding-left: 20px; padding-right: 20px;
+}
+#layoutRoot[data-sidebar-state="closed"] #sidebar{
+  width: 0;
+  padding-left: 0; padding-right: 0;
+}
+
+/* ===== Split button: Sezioni + gruppi principali ===== */
+.sidebar .sections-split,
+#sectionsMenu,
+#sidebarActions,
+#sectionButtons {
+  width: 100%;
+  min-width: 0;            /* <<< fondamentale in flex */
+  box-sizing: border-box;  /* allinea bordi e padding */
+}
+
+.sidebar .sections-split{
+  position: relative;
+  display: flex;
+  flex-direction: column;   /* <<< menu sotto al bottone */
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  gap: 6px;                 /* respiro tra bottone e menu */
+}
+
+/* Pulsante principale */
+.sidebar #sectionsMainBtn{
+  flex: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #444;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .08s ease;
+}
+.sidebar #sectionsMainBtn:hover{ background-color: #555; }
+.sidebar #sectionsMainBtn .icon{
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Menu Sezioni: in flusso, spinge giù i bottoni sotto */
+#sectionsMenu[hidden]{ display: none !important; }
+#sectionsMenu{
+  position: static;
+  background: #2a2a2a;
+  color: inherit;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 8px;
+
+  /* allineamento con i bottoni sopra */
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 6px 0 0;
+  padding: 0;                /* ← ripristina spazio interno del contenitore */
+
+  /* colonna semplice che SPINGE in basso ciò che sta sotto */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  /* scrollbar coerente e niente “salti” */
+  max-height: 42vh;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+}
+
+/* Scrollbar coerente per la tendina Sezioni */
+#sectionsMenu::-webkit-scrollbar { width: 10px; }
+#sectionsMenu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 8px; }
+body.light #sectionsMenu::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.22); }
+#sectionsMenu::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
+body.light #sectionsMenu::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.32); }
+
+/* override per il tema chiaro */
+body.light #sectionsMenu{
+  background:#FFFFFF;
+  color:#111315;
+  border-color:#E5E7EB;
+  box-shadow:0 10px 24px rgba(0,0,0,0.12);
+}
+
+/* Voci del menu Sezioni */
+#sectionsMenu .menu-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  background: transparent;
+  color: inherit;
+  border: none;
+  padding: 10px 12px;          /* identico ai bottoni principali */
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color .15s ease, transform .06s ease;
+  min-width: 0;                /* ← evita schiacciamenti in flex */
+}
+
+#sectionsMenu .menu-item:hover{ background: rgba(127,127,127,0.14); }
+body.light #sectionsMenu .menu-item:hover{ background: rgba(0,0,0,0.04); }
+#sectionsMenu .menu-item:active{ transform: translateY(0.5px); }
+
+#sectionsMenu .menu-item:first-child{
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+  border-bottom: 4px solid rgba(255,255,255,0.25); /* più spessa e definita */
+  border-radius: 0 !important; /* <-- niente stondatura */
+}
+body.light #sectionsMenu .menu-item:first-child{
+  border-bottom: 4px solid rgba(0,0,0,0.16);
+  border-radius: 0 !important; /* <-- anche in tema chiaro */
+}
+
+
+/* Icona penna prima del testo (senza toccare il markup) */
+#sectionsMenu .menu-item:first-child::before{
+  content: '';
+  display: inline-block;
+  width: 18px; height: 18px;
+  margin-right: 8px;
+  /* Penna (SVG inline) */
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Stato “aperto” Sezioni */
+#sectionsMainBtn[aria-expanded="true"]{
+  box-shadow: 0 0 0 2px rgba(127,127,127,0.25) inset;
+}
+
+/* Quando la barra è aperta: consenti ombre del pannello */
+#layoutRoot[data-sidebar-state="open"] .sidebar{
+  overflow-y: visible;
+}
+
+/* Separatore visuale sotto "Torna al menu" */
+.sidebar-sep {
+  height: 1px;
+  border-radius: 1px;
+  margin: 6px 0 4px;
+  background: rgba(255,255,255,0.16); /* default (dark) */
+}
+
+body.light .sidebar-sep {
+  background: #D1D5DB;   /* grigio chiaro ben visibile su sfondo #F3F4F6 */
+}
+
+/* Leggero aumento del gap tra i pulsanti del gruppo azioni */
+#sidebarActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* prima era 10px */
+}
+
+/* Tema chiaro ottimizzato per la sidebar */
+body.light .sidebar {
+  background-color: #FFFFFF;          /* bianco neutro */
+  color: #111315;
+  border-right: 1px solid #E5E7EB;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.03);  /* 🔹 ombra più leggera */
+}
+
+/* Pulsanti nella sidebar */
+body.light .sidebar button {
+  background-color: #F9FAFB;
+  color: #111315;
+  border: 1px solid #E5E7EB;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background-color .15s ease; /* 🔹 rimosso box-shadow dinamico */
+}
+
+body.light .sidebar button:hover {
+  background-color: #F3F4F6;
+}
+
+/* Pulsante "Torna al menu" e "Esporta" */
+body.light .sidebar .btn-with-icon,
+body.light #exportMainBtn,
+body.light #exportMenuToggle {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  color: #111315;
+}
+
+body.light .sidebar .btn-with-icon:hover,
+body.light #exportMainBtn:hover,
+body.light #exportMenuToggle:hover {
+  background-color: #F3F4F6;
+}
+
+/* Pulsante principale Sezioni */
+body.light #sectionsMainBtn {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  color: #111315;
+}
+body.light #sectionsMainBtn:hover {
+  background-color: #F3F4F6;
+}
+
+/* Separatore coerente */
+body.light .sidebar-sep {
+  background: #E5E7EB;
+}
+
+
+
+/* ======================================================================
+   AREA EDITOR
+   ====================================================================== */
+.editor {
+  flex: 1; padding: 20px; position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden;
+}
+
+/* Pulsanti icona in alto a destra */
+/* Pulsanti icona in alto a destra (spostati leggermente a sinistra per non sovrapporsi alla scrollbar) */
+.top-right-controls {
+  position: fixed; top: 12px; right: 36px;   /* era 20px */
+  display: flex; gap: 10px; z-index: 1000;
+}
+
+/* Su schermi stretti riportiamo il margine a 20px */
+@media (max-width: 900px){
+  .top-right-controls { right: 20px; }
+}
+.top-right-controls button {
+  background: transparent; color: #fff; border: none; padding: 6px;
+  font-size: 18px; border-radius: 50%; cursor: pointer;
+  transition: background-color .2s ease;
+}
+body.light .top-right-controls button { color: #000; }
+.top-right-controls button:hover { background: rgba(255,255,255,0.1); }
+body.light .top-right-controls button:hover { background: rgba(0,0,0,0.1); }
+.top-right-controls button .icon{
+  width: 18px; height: 18px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* Piccolo aggiustamento estetico quando la barra è aperta */
+#layoutRoot[data-sidebar-state="open"]  .editor{ padding-left:20px; }
+#layoutRoot[data-sidebar-state="closed"] .editor{ padding-left:0; }
+
+/* Selettore modalità (Scene) */
+.mode-selector{ display:none; position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:10; }
+.mode-selector select{ padding:6px 12px; font-size:14px; border-radius:4px; }
+
+/* ===== Toolbar testo ===== */
+#formatToolbar.toolbar--single{
+  width: max-content;
+  max-width: calc(var(--page-width, 900px) - 32px);
+  margin: 8px auto 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(127,127,127,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.hide-toolbar #formatToolbar{ display:none; }
+
+#formatToolbar .tb-sep{
+  width:1px; height:20px;
+  background:rgba(127,127,127,0.35);
+  margin:0 4px;
+}
+#formatToolbar .tb-btn{
+  background:transparent; border:1px solid transparent; color:inherit;
+  padding:6px 8px; border-radius:6px; cursor:pointer; font-size:14px;
+}
+#formatToolbar .tb-btn:hover{ background:rgba(127,127,127,0.18); }
+#formatToolbar .tb-btn[aria-pressed="true"]{
+  background:rgba(127,127,127,0.28); border-color:rgba(127,127,127,0.35);
+}
+#formatToolbar .tb-btn[disabled],
+#formatToolbar .tb-btn[aria-disabled="true"]{ opacity:.5; cursor:default; }
+
+/* === Override tema chiaro (più soft) === */
+body.light #formatToolbar.toolbar--single{
+  background:#FFFFFF;
+  border:1px solid #E5E7EB;
+}
+body.light #formatToolbar .tb-btn:hover{ background:rgba(0,0,0,0.04); }
+body.light #formatToolbar .tb-btn[aria-pressed="true"]{
+  background:rgba(0,0,0,0.08);
+  border-color:#E5E7EB;
+}
+
+/* Light: toolbar su bianco con ombra soft */
+body.light #formatToolbar.toolbar--single{
+  background:#FFFFFF;
+  border:1px solid #E5E7EB;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+
+/* Responsivo: sotto una certa larghezza torna fluida */
+@media (max-width: 820px){
+  #formatToolbar.toolbar--single{
+    width: 100%;
+    max-width: var(--page-width, 900px);
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* Area scroll comune */
+#editorArea{
+  width:100%; flex:1; overflow-y:auto; padding:16px 0 40px;
+  display:flex; flex-direction:column; align-items:center; gap:40px;
+  scrollbar-gutter:stable both-edges;
+}
+/* Scrollbar verticale (editorArea) */
+#editorArea::-webkit-scrollbar { width: 10px; }
+#editorArea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 8px; }
+#editorArea::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
+body.light #editorArea::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.22); }
+body.light #editorArea::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.32); }
+
+/* === Scrollbar coerente per il MODALE Versioni (copre body scrollabile e figli) === */
+
+/* Stabilizza il gutter */
+#versionsOverlay .versions-panel,
+#versionsOverlay .versions-panel * { scrollbar-gutter: stable; }
+
+/* Firefox */
+#versionsOverlay .versions-panel,
+#versionsOverlay .versions-panel * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+body.light #versionsOverlay .versions-panel,
+body.light #versionsOverlay .versions-panel * { scrollbar-color: rgba(0,0,0,0.22) transparent; }
+
+/* WebKit */
+#versionsOverlay .versions-panel::-webkit-scrollbar,
+#versionsOverlay .versions-panel *::-webkit-scrollbar { width: 10px; }
+
+#versionsOverlay .versions-panel::-webkit-scrollbar-thumb,
+#versionsOverlay .versions-panel *::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 8px;
+}
+#versionsOverlay .versions-panel::-webkit-scrollbar-thumb:hover,
+#versionsOverlay .versions-panel *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+/* Tema chiaro */
+body.light #versionsOverlay .versions-panel::-webkit-scrollbar-thumb,
+body.light #versionsOverlay .versions-panel *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.22); }
+body.light #versionsOverlay .versions-panel::-webkit-scrollbar-thumb:hover,
+body.light #versionsOverlay .versions-panel *::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.32); }
+
+
+/* Pagina */
+.page {
+  background: #fff;
+  color: #000;
+  width: 100%;
+  max-width: var(--page-width);
+  height: var(--page-height);
+  padding: 54px 66px; /* 🔹 stessi margini del PDF */
+  border: 1px solid #ECEFF3;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  outline: none;
+}
+
+.page:focus,
+.page *:focus,
+#editorArea:focus {
+  outline: none !important;
+}
+
+/* === Base: SCENE / TEATRO / CAPITOLI (Courier Prime) === */
+.page-content {
+  flex: 1 1 auto;
+  min-height: 1em;
+  overflow: hidden;
+  width: 600px;           /* ✅ per sceneggiatura (pari al PDF con Courier Prime) */
+  margin: 0 auto;
+  white-space: normal;
+  word-wrap: break-word;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* === Narrative sections: Concept, Trattamento, Note, Libro === */
+body.concept-mode .page-content,
+body.soggetto-mode .page-content,
+body.trattamento-mode .page-content,
+body.note-mode .page-content,
+body.libro-mode .page-content {
+  width: 740px;                 /* leggermente più ampia (era 724) per più respiro visivo */
+  padding-left: 12px;           /* margine sinistro extra */
+  padding-right: 12px;          /* margine destro extra */
+  text-indent: -1px;            /* corregge la prima lettera “spostata” */
+  font-family: 'Lora', 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.48;
+}
+
+
+
+
+
+/* Placeholder localizzato come tutte le altre sezioni */
+.page-content.is-empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.45;
+  font-style: italic;
+  pointer-events: none;     /* ← non blocca il click */
+  user-select: none;        /* ← non selezionabile */
+}
+
+body.light .page-content.is-empty::before {
+  color: #6B7280;
+}
+body.dark .page-content.is-empty::before {
+  color: #bbb;
+}
+
+
+/* Numero di pagina */
+.page-number {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 12px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Tema scuro */
+body.dark .page {
+  background: #1e1e1e;
+  color: #eee;
+  border-color: #333;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== LAYOUT SCENE COMUNE ========== */
+.scene-mode .page{ --page-width:700px; --page-padding:40px; }
+
+/* Riga vuota tra blocchi scena (gap) */
+.scene-gap{
+  display:block;
+  height: 1.2em;
+  line-height: 1.2em;
+  margin: 4px 0;
+  white-space: pre;
+}
+
+/* ========== SCENEGGIATURA (CINEMA) ========== */
+.scene-heading{ text-transform:uppercase; font-weight:bold; }
+.character{ text-transform:uppercase; text-align:center; margin:0 auto; width:300px; }
+.dialogue{ text-align:center; margin:0 auto; width:400px; }
+.parenthetical{ text-align:center; margin:0 auto; width:360px; font-style:italic; }
+.transition{ text-align:right; text-transform:uppercase; font-weight:bold; }
+.action{ text-align:left; }
+
+/* ========== TEATRO ========== */
+.theatre-mode .page{ --page-width:700px; --page-padding:40px; }
+
+.theatre-mode .scene-heading{
+  text-transform:uppercase; font-weight:700;
+  text-align:center; margin:6px auto 14px;
+}
+.theatre-mode .character{
+  text-transform:uppercase; text-align:center; margin:12px auto 0; width:320px;
+}
+.theatre-mode .dialogue{
+  text-align:left; margin:4px 0 8px 0; width:100%;
+}
+.theatre-mode .stage-direction{
+  font-style:italic; text-align:left; margin:6px 0 10px 1em; opacity:.95;
+}
+
+/* ======================================================================
+   TIMELINE SEMPLICE
+   ====================================================================== */
+#timelineToolbar{
+  width:auto; margin:8px auto; padding:6px 8px; border-radius:8px;
+  background:rgba(127,127,127,0.12);
+  display:inline-flex; align-items:center; gap:8px; position:relative;
+}
+#timelineToolbar .tl-btn{
+  background:transparent; border:1px solid rgba(127,127,127,0.35);
+  color:inherit; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px;
+}
+#timelineToolbar .tl-btn:hover{ background:rgba(127,127,127,0.18); }
+#timelineToolbar .tl-sep{ width:1px; height:18px; background:rgba(127,127,127,0.35); margin:0 4px; }
+#timelineToolbar .tl-zoom{ min-width:46px; text-align:center; opacity:.75; }
+
+#timelineContainer{
+  width:100%; flex:1; display:none; flex-direction:column; align-items:center; justify-content:center;
+  padding:12px 0 20px; gap:12px;
+}
+
+/* ===== TIMELINE VIEWPORT ===== */
+#timelineViewport{
+  min-width:1200px;
+  width:100%;
+  max-width:none;
+  height:600px;
+
+  /* → solo verticale, deve adattarsi allo zoom */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding:32px 16px;
+  position:relative;
+  scrollbar-gutter: stable;           /* riserva spazio verticale */
+  border-radius:10px;
+  background:rgba(127,127,127,0.08);  /* base (dark-friendly) */
+
+  display:flex;
+  align-items:flex-start;             /* centratura verticale la gestisci tu a scroll */
+  scroll-behavior:smooth;
+}
+/* Light: timeline come pannello separato */
+body.light #timelineViewport{
+  background:#F6F7FA;                 /* più vicino al bianco, meno grigio piatto */
+  border:1px solid #E5E7EB;           /* bordo sottile, come le pagine */
+  box-shadow: inset 0 1px 0 #FFFFFF,  /* luce interna in alto */
+              0 8px 24px rgba(0,0,0,0.04); /* ombra esterna soft */
+}
+
+
+/* “Sizer” invisibile che estende l’altezza scrollabile in base allo zoom */
+#timelineSizer{
+  position:absolute;
+  left:0; top:0;
+  width:1px; height:0;                /* JS aggiorna l’altezza */
+  pointer-events:none; opacity:0;
+}
+
+/* Orizzontale + Verticale (styling) */
+#timelineViewport::-webkit-scrollbar{ height:10px; width:10px; }
+#timelineViewport::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,0.18);
+  border-radius:8px;
+}
+#timelineViewport::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,0.28); }
+/* Light scrollbar più soft */
+body.light #timelineViewport::-webkit-scrollbar-thumb{ background:#D4D6DB; }
+body.light #timelineViewport::-webkit-scrollbar-thumb:hover{ background:#C6CAD1; }
+
+#timelineTrack {
+  position: relative;
+  display: inline-flex;
+  width: max-content;
+  gap: var(--tl-gap);
+  align-items: center;
+  padding: 0 24px;
+
+  /* Zoom nitido (niente blur) */
+  zoom: var(--tl-zoom);
+}
+
+#timelineTrack::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: rgba(127,127,127,0.35);
+  pointer-events: none;
+}
+/* Linea più neutra in light */
+body.light #timelineTrack::before{ background: rgba(0,0,0,0.20); }
+
+/* Punta di freccia verso destra */
+#timelineTrack::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -14px; /* sposta la freccia subito dopo la linea */
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  
+  /* dimensioni freccia più grandi */
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid rgba(127,127,127,0.65);
+  
+  pointer-events: none;
+}
+body.light #timelineTrack::after { border-left-color: rgba(0,0,0,0.45); }
+
+/* Card timeline */
+.ev-card{
+  background:#fff; color:#111315;
+  border:1px solid #E5E7EB;
+  border-radius:10px; padding:10px 12px 12px; min-width:240px; max-width:320px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.06); position:relative; user-select:none;
+  will-change: transform, box-shadow;
+}
+body.dark .ev-card{
+  background:#1e1e1e; color:#eee; border-color: rgba(255,255,255,0.15);
+}
+
+.ev-color-bar{
+  position:absolute; left:0; right:0; top:0; height:4px;
+  border-top-left-radius:10px; border-top-right-radius:10px;
+}
+.ev-color-menu{
+  position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+  font-size:12px; padding:2px 4px; border-radius:6px;
+  border:1px solid rgba(127,127,127,0.35);
+  background:#1e1e1e; color:#eee; z-index:6;
+}
+/* Menu colore in light più leggibile e coerente */
+body.light .ev-color-menu{
+  background:#fff; color:#111315; border-color:#E5E7EB;
+}
+.ev-color-btn{
+  position:absolute; top:-16px; left:50%; transform:translateX(-50%);
+  width:16px; height:16px; border-radius:4px; border:1px solid rgba(127,127,127,0.6);
+  background:#aaa; cursor:pointer; z-index:5;
+}
+
+/* X chiusura comune */
+.ev-close{
+  position:absolute; top:6px; right:6px;
+  background:transparent; border:none; padding:0; width:auto; height:auto; line-height:1; font-size:16px;
+  color:rgba(255,255,255,0.85); cursor:pointer; user-select:none; z-index:4;
+}
+body.light .ev-close{ color: rgba(0,0,0,0.75); }
+.ev-close:hover{ color:#fff; transform:scale(1.06); }
+
+.ev-drag{
+  position:absolute; left:50%; transform:translate(-50%, calc(100% + 8px));
+  width:12px; height:12px; border-radius:50%;
+  background:rgba(127,127,127,0.6); border:1px solid rgba(127,127,127,0.7);
+  cursor:grab; z-index:4;
+}
+.ev-drag:active{ cursor:grabbing; }
+
+.ev-title{
+  font-weight:700; margin:0 0 6px 0; outline:none; text-transform:uppercase;
+  line-height:1.25; max-height:calc(1.25em * 2); overflow:hidden; white-space:pre-wrap;
+}
+.ev-desc{
+  font-size:14px; line-height:1.35; outline:none; overflow:hidden; text-overflow:ellipsis;
+  max-height:calc(1.35em * var(--ev-desc-lines, 4));
+  line-clamp: var(--ev-desc-lines, 4);
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:var(--ev-desc-lines, 4);
+}
+.ev-desc:focus{
+  display:block;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  max-height:8em; overflow-y:auto;
+  scrollbar-width:none; -ms-overflow-style:none;
+}
+.ev-desc:focus::-webkit-scrollbar{ width:0; height:0; }
+/* usa il testo localizzato messo in data-placeholder e non dipende più da stringhe hardcoded */
+.ev-title.is-empty::before{ content: attr(data-placeholder); opacity:.55; font-weight:700; }
+.ev-desc.is-empty::before{  content: attr(data-placeholder); opacity:.55; font-style:italic; }
+
+.ev-card.dragging{ opacity:.6; transform:scale(0.98); }
+.ev-card.drop-hint { outline:2px dashed rgba(127,127,127,0.45); }
+.ev-card.drop-hint-top::before,
+.ev-card.drop-hint-bottom::before,
+.ev-card.drop-hint-left::before,
+.ev-card.drop-hint-right::before{
+  content:''; position:absolute; left:0; right:0; top:0; bottom:0; border-radius:10px; pointer-events:none;
+}
+.ev-card.drop-hint-top::before{    background:linear-gradient(to bottom, rgba(0,150,255,0.25), transparent 60%); }
+.ev-card.drop-hint-bottom::before{ background:linear-gradient(to top,    rgba(0,150,255,0.25), transparent 60%); }
+.ev-card.drop-hint-left::before{   background:linear-gradient(to right,   rgba(0,150,255,0.25), transparent 60%); }
+.ev-card.drop-hint-right::before{  background:linear-gradient(to left,    rgba(0,150,255,0.25), transparent 60%); }
+
+.ev-card.denied{ animation:ev-denied .25s ease-in-out 1; }
+@keyframes ev-denied{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);} }
+
+.timeline-readonly .ev-card{ cursor:default; }
+.timeline-readonly .ev-title, .timeline-readonly .ev-desc{ pointer-events:none; }
+.timeline-readonly .ev-color-btn{ pointer-events:none; opacity:.6; }
+
+/* STACK timeline */
+.ev-stack{
+  position:relative; display:inline-flex; flex-direction:column; align-items:center; gap:var(--ev-stack-gap);
+}
+.ev-stack::before{
+  content:''; position:absolute; top:8px; bottom:8px; left:50%; width:2px; transform:translateX(-50%);
+  background:rgba(127,127,127,0.35); pointer-events:none;
+}
+/* Colonna stack più neutra in light */
+body.light .ev-stack::before{ background:rgba(0,0,0,0.20); }
+
+
+/* ======================================================================
+   PERSONAGGI (CARD)
+   ====================================================================== */
+.char-wrap{
+  width:100%; max-width:1100px; display:flex; flex-direction:column; gap:16px; margin-top:6px;
+}
+
+.char-toolbar, .beat-toolbar, .bible-toolbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:6px 10px;
+  border-radius:8px;
+  background:rgba(127,127,127,0.12);
+}
+
+/* Pulsante + sezione in Bibbia */
+.bible-add-btn {
+  white-space:nowrap;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(127,127,127,0.35);
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+}
+.bible-add-btn:hover {
+  background:rgba(127,127,127,0.18);
+}
+
+.char-search-wrap, .beat-search-wrap, .bible-search-wrap{
+  position:relative; display:flex; align-items:center; width:100%;
+}
+.char-search, .beat-search, .bible-search{
+  flex:1; width:100%; padding:8px 36px 8px 12px;
+  border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  background:transparent; color:inherit; font-family:inherit; font-size:14px;
+  outline:none; box-shadow:none;
+}
+.char-search::-webkit-search-cancel-button,
+.beat-search::-webkit-search-cancel-button,
+.bible-search::-webkit-search-cancel-button{
+  -webkit-appearance:none; appearance:none; display:none;
+}
+.char-search:focus, .beat-search:focus, .bible-search:focus{
+  border-color:#101010;
+  outline:2px solid #101010;
+  outline-offset:2px;
+  box-shadow:0 0 0 2px rgba(16,16,16,0.12);
+}
+.char-search-clear, .beat-search-clear, .bible-search-clear{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:24px; height:24px; border-radius:6px; border:none; background:transparent; color:#fff;
+  display:none; align-items:center; justify-content:center; cursor:pointer;
+}
+body.light .char-search-clear, body.light .beat-search-clear, body.light .bible-search-clear{ color:#000; }
+
+.char-add-btn, .beat-add-btn, .bible-add-btn{
+  white-space:nowrap;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(127,127,127,0.35);
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+}
+.char-add-btn:hover, .beat-add-btn:hover, .bible-add-btn:hover{
+  background:rgba(127,127,127,0.18);
+}
+
+.char-list, .beat-list{
+  width:100%; display:flex; flex-direction:column; gap:16px; align-items:stretch;
+}
+.char-empty, .beat-empty{
+  width:100%; text-align:center; opacity:.7; font-style:italic; padding:24px 0;
+}
+
+.ch-card{
+  position:relative; border:1px solid rgba(127,127,127,0.35); border-radius:12px;
+  padding:12px 12px 16px; width:100%; max-width:1100px; margin:0 auto; background:rgba(127,127,127,0.06);
+}
+
+/* Header personaggi */
+.ch-header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:8px 10px; align-items:center; margin-bottom:10px;
+}
+.ch-name{
+  min-height:36px; padding:8px 10px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  outline:none; background:transparent; color:inherit; font-weight:700;
+  max-width:100%; min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;
+}
+.ch-name:empty::before{ content:attr(data-placeholder); opacity:.55; }
+
+.ch-actions{ display:inline-flex; gap:6px; justify-content:flex-end; align-items:center; }
+.ch-action{
+  border:1px solid rgba(127,127,127,0.35); background:transparent; color:inherit;
+  padding:6px 8px; border-radius:8px; cursor:pointer;
+}
+.ch-action:hover{ background:rgba(127,127,127,0.18); }
+.ch-action:disabled{ opacity:.6; cursor:default; }
+.ch-toggle{ width:34px; }
+
+/* PATCH: pulsante inline per aggiungere sezione personalizzata */
+.ch-actions .inline-add-btn{
+  border:1px dashed rgba(127,127,127,0.45);
+  padding:6px 10px;
+  border-radius:8px;
+}
+.ch-actions .inline-add-btn:hover{
+  background:rgba(127,127,127,0.18);
+}
+
+/* X chiusura */
+.ch-close{
+  position:static;
+  margin-left:0;
+  background:transparent; border:none; padding:0 2px; width:auto; height:auto; line-height:1; font-size:16px;
+  color:inherit; cursor:pointer;
+}
+.ch-close:hover{ opacity:.9; }
+
+.ch-body{ display:grid; grid-template-columns:200px minmax(0,1fr); gap:10px 14px; }
+.ch-field{ display:contents; }
+
+/* Etichetta/Label (host controlli overlay) */
+.ch-label{
+  align-self:start; padding:10px 6px 0 6px; opacity:.85; font-size:14px;
+  font-weight:700; text-transform:uppercase;
+  position: relative;
+}
+
+.ch-input{
+  min-height:40px; padding:10px 12px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  outline:none; background:transparent; color:inherit; font-size:14px;
+  max-width:100%; min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;
+}
+.ch-input:focus{
+  border-color:#101010;
+  outline:2px solid #101010;
+  outline-offset:2px;
+  box-shadow:0 0 0 2px rgba(16,16,16,0.12);
+}
+.ch-input:empty::before{ content:attr(data-placeholder); opacity:.55; font-style:italic; }
+.ch-multiline{ min-height:60px; overflow:visible; }
+.ch-line{ min-height:40px; }
+
+/* PATCH: controlli overlay per sezioni personalizzate (rename/drag/collapse/delete) */
+.field-ctrls{
+  position:absolute; right:6px; top:6px; display:flex; align-items:center; gap:var(--ctrl-gap);
+  opacity:.85;
+}
+.field-ctrls button{
+  width:var(--ctrl-size); height:var(--ctrl-size);
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  background:transparent; color:inherit; cursor:pointer;
+  font-size:14px; line-height:1;
+}
+.field-ctrls button:hover{ background:rgba(127,127,127,0.18); }
+
+.drag-handle{
+  cursor:grab; user-select:none; font-weight:700;
+}
+.drag-handle:active{ cursor:grabbing; }
+
+.field-dragging .ch-label,
+.field-dragging .bt-label{ opacity:.6; }
+.field-drop-hint{
+  outline:2px dashed rgba(127,127,127,0.45);
+  border-radius:8px;
+}
+
+/* Collassamento del contenuto del campo */
+.is-collapsed + .ch-input,
+.is-collapsed + .bt-input{ display:none; }
+
+/* Readonly */
+.char-readonly .ch-input, .char-readonly .ch-name{ pointer-events:none; }
+.char-readonly .ch-action, .char-readonly .ch-close, .char-readonly .char-add-btn{ pointer-events:none; opacity:.6; }
+
+/* ======================================================================
+   SCALETTA (BEAT)
+   ====================================================================== */
+.beat-wrap{
+  width:100%; max-width:1100px; display:flex; flex-direction:column; gap:16px; margin-top:6px;
+}
+
+.beat-group-wrap{ display:none; }
+.beat-group-label{ display:none; }
+.beat-group-select{ display:none; }
+
+.bt-card{
+  position:relative; border:1px solid rgba(127,127,127,0.35); border-radius:12px;
+  padding:12px 12px 16px; width:100%; max-width:1100px; margin:0 auto; background:rgba(127,127,127,0.06);
+}
+
+.bt-header{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  gap:8px 10px; align-items:center; margin-bottom:10px;
+}
+.bt-index{
+  min-width:36px; padding:8px 10px; text-align:center;
+  border:1px solid rgba(127,127,127,0.35); border-radius:8px;
+  font-weight:700; opacity:.85; user-select:none;
+}
+.bt-title{
+  min-height:36px; padding:8px 10px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  outline:none; background:transparent; color:inherit; font-weight:700;
+  max-width:100%; min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;
+}
+.bt-title:empty::before{ content:attr(data-placeholder); opacity:.55; }
+
+.bt-actions{ display:inline-flex; gap:6px; justify-content:flex-end; align-items:center; }
+.bt-action{
+  border:1px solid rgba(127,127,127,0.35); background:transparent; color:inherit;
+  padding:6px 8px; border-radius:8px; cursor:pointer;
+}
+.bt-action:hover{ background:rgba(127,127,127,0.18); }
+.bt-action:disabled{ opacity:.6; cursor:default; }
+.bt-toggle{ width:34px; }
+
+/* PATCH: pulsante inline per aggiungere sezione personalizzata */
+.bt-actions .inline-add-btn{
+  border:1px dashed rgba(127,127,127,0.45);
+  padding:6px 10px;
+  border-radius:8px;
+}
+.bt-actions .inline-add-btn:hover{
+  background:rgba(127,127,127,0.18);
+}
+
+.bt-close{
+  position:static;
+  margin-left:0;
+  background:transparent; border:none; padding:0 2px; width:auto; height:auto; line-height:1; font-size:16px;
+  color:inherit; cursor:pointer;
+}
+.bt-close:hover{ opacity:.9; }
+
+.bt-body{
+  display:grid; grid-template-columns:200px minmax(0,1fr); gap:10px 14px;
+}
+.bt-field{ display:contents; }
+
+/* Etichetta: host per controlli overlay (custom fields) */
+.bt-label{
+  align-self:start; padding:10px 6px 0 6px; opacity:.85; font-size:14px;
+  font-weight:700; text-transform:uppercase;
+  position: relative;
+}
+.bt-input{
+  min-height:40px; padding:10px 12px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  outline:none; background:transparent; color:inherit; font-size:14px;
+}
+.bt-input:focus{
+  border-color:#101010;
+  outline:2px solid #101010;
+  outline-offset:2px;
+  box-shadow:0 0 0 2px rgba(16,16,16,0.12);
+}
+.bt-input:empty::before{ content:attr(data-placeholder); opacity:.55; font-style:italic; }
+.bt-multiline{ min-height:60px; overflow:visible; }
+.bt-line{ min-height:40px; }
+
+/* Readonly */
+.beat-readonly .bt-input, .beat-readonly .bt-title{ pointer-events:none; }
+.beat-readonly .bt-action, .beat-readonly .beat-add-btn{ pointer-events:none; opacity:.6; }
+
+/* ======================================================================
+   BIBBIA
+   ====================================================================== */
+.bible-wrap{
+  width:100%; max-width:1100px; display:flex; flex-direction:column; gap:16px; margin-top:6px;
+}
+.bible-list{
+  width:100%; display:flex; flex-direction:column; gap:16px; align-items:stretch;
+}
+.bb-card{
+  position:relative; border:1px solid rgba(127,127,127,0.35); border-radius:12px;
+  padding:12px 12px 16px; width:100%; max-width:1100px; margin:0 auto; background:rgba(127,127,127,0.06);
+}
+.bb-header{
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 10px; align-items:center; margin-bottom:10px;
+}
+.bb-title{
+  font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+  padding:8px 10px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  background:transparent;
+}
+.bb-actions{ display:inline-flex; gap:6px; justify-content:flex-end; align-items:center; }
+.bb-action{
+  border:1px solid rgba(127,127,127,0.35); background:transparent; color:inherit;
+  padding:6px 8px; border-radius:8px; cursor:pointer;
+}
+.bb-action:hover{ background:rgba(127,127,127,0.18); }
+.bb-toggle{ width:34px; }
+
+.bb-body{ display:block; }
+.bb-input{
+  min-height:80px; padding:10px 12px; border-radius:8px; border:1px solid rgba(127,127,127,0.35);
+  outline:none; background:transparent; color:inherit; font-size:14px; line-height:1.45;
+  white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;
+}
+.bb-input:focus{
+  border-color:#101010;
+  outline:2px solid #101010;
+  outline-offset:2px;
+  box-shadow:0 0 0 2px rgba(16,16,16,0.12);
+}
+.bb-input:empty::before{ content:attr(data-placeholder); opacity:.55; font-style:italic; }
+
+/* readonly */
+.bible-readonly .bb-input{ pointer-events:none; }
+.bible-readonly .bb-action{ pointer-events:none; opacity:.6; }
+
+/* ========================= PATCH — Sezioni personalizzate ========================= */
+.bt-custom-row .bt-label,
+.ch-custom-row .ch-label {
+  position: relative;
+  padding-right: 72px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  display: block;
+}
+.bt-custom-row .bt-input,
+.ch-custom-row .ch-input { margin-top: 4px; }
+
+.field-ctrls { position: absolute; top: 6px; right: 6px; display: inline-flex; gap: 6px; z-index: 1; }
+.field-ctrls button{
+  background: transparent; color: inherit; border: 1px solid rgba(127,127,127,0.35);
+  border-radius: 6px; padding: 2px 6px; line-height: 1; cursor: pointer;
+}
+.field-ctrls button:hover { background: rgba(127,127,127,0.18); }
+
+.inline-add-btn { padding: 6px 8px; }
+
+.ch-custom-row .ch-label .label-text:empty::before,
+.bt-custom-row .bt-label .label-text:empty::before,
+.bb-card[data-id^="custom_"] .bb-title:empty::before {
+  content: attr(data-placeholder);
+  opacity: .55; font-style: italic; color: inherit;
+}
+.ch-custom-row .ch-label .label-text,
+.bt-custom-row .bt-label .label-text {
+  display: inline-block; min-width: 1px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;
+}
+.ch-custom-row .label-text[contenteditable="true"]:focus,
+.bt-custom-row .label-text[contenteditable="true"]:focus,
+.bb-card[data-id^="custom_"] .bb-title[contenteditable="true"]:focus {
+  outline: 2px solid #101010;
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(16, 16, 16, 0.12);
+}
+/* === Versioni: base + tema chiaro === */
+
+/* base: niente cambi in dark */
+.versions-panel {
+  /* assicura che il bordo usi il nostro colore se il JS mette un generico */
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* Tema chiaro: sfondo e testo più leggibili */
+body.light .versions-panel{
+  background:#FFFFFF !important; color:#111315 !important;
+  border-color:#E5E7EB !important;
+  box-shadow:0 20px 48px rgba(0,0,0,.14) !important;
+}
+
+
+/* Input “Etichetta versione…” nel tema chiaro */
+body.light #versionLabelInput {
+  border-color: rgba(0,0,0,0.25);
+  color: #111;
+}
+body.light #versionLabelInput::placeholder {
+  color: rgba(0,0,0,0.45);
+}
+
+/* Bottoni nel pannello Versioni */
+.versions-panel .btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(127,127,127,0.35);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.versions-panel .btn:hover {
+  background: rgba(127,127,127,0.18);
+}
+
+/* Bottoni in tema chiaro */
+body.light .versions-panel .btn {
+  background: #ececec;
+  color: #111;
+  border-color: rgba(0,0,0,0.20);
+}
+body.light .versions-panel .btn:hover {
+  background: #e2e2e2;
+}
+
+/* Righe elenco versioni: contrasto ok in light */
+body.light #versionsList > div {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.18);
+}
+body.light #versionsList > div div[style*="font-size:13px"] {
+  color: rgba(0,0,0,0.7);
+}
+/* Track chiaro per coerenza */
+body.light #editorArea::-webkit-scrollbar-track,
+body.light #timelineViewport::-webkit-scrollbar-track,
+body.light #sectionsMenu::-webkit-scrollbar-track{
+  background:#EFF1F4;
+}
+/* === Override tema chiaro per card Personaggi / Scaletta / Bibbia === */
+body.light .ch-card,
+body.light .bt-card,
+body.light .bb-card{
+  background:#FFFFFF;
+  border:1px solid #E5E7EB;
+  box-shadow:0 8px 24px rgba(0,0,0,0.06);
+}
+/* ======================================================================
+   LISTE — supporto coerente per editor e export
+   ====================================================================== */
+
+/* Bullet list */
+.page-content ul {
+  list-style-type: disc;
+  margin: 0.8em 0 0.8em 2em;
+  padding-left: 1.5em;
+}
+
+/* Numbered list */
+.page-content ol {
+  list-style-type: decimal;
+  margin: 0.8em 0 0.8em 2em;
+  padding-left: 1.5em;
+}
+
+/* Nested lists */
+.page-content ul ul,
+.page-content ol ol,
+.page-content ul ol,
+.page-content ol ul {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  margin-left: 1.5em;
+}
+
+/* Items */
+.page-content li {
+  margin-bottom: 0.3em;
+  line-height: 1.45;
+}
+
+/* Bullet + Number color coherence (dark mode fix) */
+body.dark .page-content ul,
+body.dark .page-content ol {
+  color: #eee;
+}
+/* ======================================================================
+   SCROLLBAR SIDEBAR — stile coerente con le altre aree
+   ====================================================================== */
+
+/* Tema scuro */
+.sidebar::-webkit-scrollbar { width: 10px; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 8px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+/* Tema chiaro */
+body.light .sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.22);
+}
+body.light .sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.32);
+}
+
+/* Track coerente (sfondo) */
+body.light .sidebar::-webkit-scrollbar-track {
+  background: #EFF1F4;
+}
+body.dark .sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* ======================================================================
+   SEARCHBAR — Bibbia / Scaletta / Personaggi (solo tema chiaro)
+   ====================================================================== */
+
+body.light .char-toolbar,
+body.light .beat-toolbar,
+body.light .bible-toolbar {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  padding: 6px 10px;
+  gap: 10px;
+}
+
+/* Input di ricerca */
+body.light .char-search,
+body.light .beat-search,
+body.light .bible-search {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #111315;
+  padding: 10px 8px;
+  flex: 1;
+  border-radius: 6px;
+}
+
+/* Placeholder */
+body.light .char-search::placeholder,
+body.light .beat-search::placeholder,
+body.light .bible-search::placeholder {
+  color: #999;
+  opacity: 0.8;
+}
+
+/* Bottone “+ Aggiungi” accanto */
+body.light .char-add-btn,
+body.light .beat-add-btn,
+body.light .bible-add-btn {
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #111315;
+  font-weight: 600;
+  padding: 8px 12px;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+
+body.light .char-add-btn:hover,
+body.light .beat-add-btn:hover,
+body.light .bible-add-btn:hover {
+  background: #F3F4F6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+/* ======================================================================
+   TOOLBAR TIMELINE — Stile uniforme (solo tema chiaro)
+   ====================================================================== */
+
+body.light #timelineToolbar {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  padding: 6px 10px;
+  gap: 8px;
+}
+
+/* Pulsanti Timeline */
+body.light #timelineToolbar .tl-btn {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  color: #111315;
+  font-weight: 600;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+
+body.light #timelineToolbar .tl-btn:hover {
+  background: #F3F4F6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* Separatore e testo zoom coerenti */
+body.light #timelineToolbar .tl-sep {
+  background: #E5E7EB;
+}
+body.light #timelineToolbar .tl-zoom {
+  color: #444;
+}
+/* ======================================================================
+   MODE SELECTOR — Tema scuro (uniforme alle toolbar)
+   ====================================================================== */
+
+body.dark .mode-selector select {
+  background: #1E1E1E;
+  color: #EEE;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+  transition: background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+/* Hover e focus: più evidenti ma morbidi */
+body.dark .mode-selector select:hover {
+  background: #252525;
+  border-color: #444;
+}
+
+body.dark .mode-selector select:focus {
+  background: #2A2A2A;
+  border-color: #555;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+  outline: none;              /* ✅ elimina il contorno blu di sistema */
+}
+
+
+/* Opzioni nel menu a tendina */
+body.dark .mode-selector option {
+  background: #1E1E1E;
+  color: #EEE;
+}
+/* Evita spazio extra all'inizio della prima pagina in scena/teatro */
+.page-content > div:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.page-content > br:first-child,
+.page-content > .scene-gap:first-child {
+  display: none !important;
+}

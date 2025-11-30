@@ -1,0 +1,295 @@
+{
+  "home": {
+    "title": "Your projects",
+    "newProjectName": { "placeholder": "New project name" },
+    "projectType": { "label": "Project type" },
+    "types": {
+      "sceneggiatura": "Screenplay",
+      "teatro": "Stage Play",
+      "libro": "Book"
+    },
+    "create": "Create project",
+    "loading": "Loading projects…",
+    "empty": "No projects yet. Create one above.",
+    "langButton": "EN",
+    "langMenu": { "title": "Change language", "it": "Italiano", "en": "English" }
+  },
+
+  "actions": { "open": "Open", "rename": "Rename", "delete": "Delete" },
+  "buttons": { "save": "Save", "cancel": "Cancel" },
+  "undo": { "undo": "Undo", "close": "Close" },
+
+  "toasts": {
+    "deleted": "Project “{name}” deleted.",
+    "deleteError": "Delete error: {msg}",
+    "renameError": "Rename error: {msg}",
+    "createError": "Error: {msg}"
+  },
+
+  "errors": {
+    "emptyName": "Name cannot be empty.",
+    "enterValidName": "Enter a valid name.",
+    "createGeneric": "Error creating the project."
+  },
+
+  "common": {
+    "delete": "Delete",
+    "create": "Create",
+    "close": "Close",
+    "cancel": "Cancel",
+    "undo": "Undo",
+    "clear": "Clear search",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deleteSection": "Delete section",
+    "loading": "Loading…",
+    "section": "section"
+  },
+
+  "editor": {
+    "back": "Back to menu",
+    "sidebar": {
+      "open": "Open sidebar",
+      "close": "Close sidebar",
+      "toggle": "Sidebar"
+    },
+    "readonly": "Read only",
+    "edit": "Edit",
+    "theme": "Toggle theme",
+    "page": "Page",
+    "sections": "Sections",
+
+    "placeholder": {
+  "start": "Start writing…"
+},
+
+
+    "sectionTitles": {
+      "scene": "Draft",
+      "capitoli": "Draft",
+      "concept": "Concept",
+      "soggetto": "Story Idea",
+      "trattamento": "Treatment",
+      "scaletta": "Outline",
+      "scaletta_book": "Chapter Breakdown",
+      "bibbia": "Bible",
+      "personaggi": "Characters",
+      "timeline": "Timeline",
+      "note": "Notes",
+      "outline": "Outline",
+      "didascalie": "Stage Directions",
+      "soggetto_logline": "Story & Logline",
+      "premessa_sinossi": "Premise & Synopsis"
+    },
+
+    "export": {
+      "title": "Export",
+      "openMenu": "Open export menu",
+      "sectionPdf": "Export section (PDF)",
+      "projectPdf": "Export project (PDF)",
+      "okProject": "✅ Full PDF exported.",
+      "okSection": "✅ Section PDF exported.",
+      "canceled": "🚫 Export canceled.",
+      "err": "❌ Export error: "
+    },
+
+    "versions": {
+      "title": "Versions",
+      "open": "Open versions panel",
+      "labelPh": "Version label…",
+      "footer": "Versions are read-only snapshots of the project. You can create, restore, or delete versions.",
+      "none": "No saved versions.",
+      "loadErr": "Error loading versions.",
+      "untitled": "(untitled)",
+      "section": "section",
+      "restore": "Restore",
+      "snapshot": "Snapshot",
+      "created": "✅ Version created.",
+      "createErr": "❌ Version creation error: ",
+      "restoreConfirm": "Restore this version? Current content will be overwritten.",
+      "restored": "✅ Version restored.",
+      "restoreErr": "❌ Restore error: ",
+      "deleteConfirm": "Permanently delete this version?",
+      "deleted": "🗑️ Version deleted.",
+      "deleteErr": "❌ Delete error: "
+    },
+
+    "settings": "Settings",
+
+    "toolbar": {
+      "text": "Formatting toolbar",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "decFont": "Decrease size",
+      "normFont": "Normal size",
+      "incFont": "Increase size",
+      "bullets": "Bulleted list",
+      "numbers": "Numbered list",
+      "indent": "Increase indent",
+      "outdent": "Decrease indent",
+      "undo": "Undo",
+      "redo": "Redo"
+    },
+
+    "timeline": {
+      "tools": "Timeline tools",
+      "addEvent": "+ Event",
+      "zoomOut": "Zoom -",
+      "zoomIn": "Zoom +",
+      "viewport": "Horizontal timeline",
+      "titlePh": "Event title…",
+      "descPh": "Description…",
+      "noColor": "No color",
+      "pickColor": "Pick color",
+      "drag": "Drag",
+      "eventRemoved": "Timeline event removed.",
+      "colors": {
+        "red": "Red (Conflict)",
+        "blue": "Blue (Dialogue)",
+        "green": "Green (Turn)",
+        "yellow": "Yellow (Setup)",
+        "purple": "Purple (Climax)",
+        "white": "White (Transition)",
+        "black": "Black (Flashback)",
+        "orange": "Orange (Tension)"
+      }
+    },
+
+    "mode": {
+      "label": "Scene writing mode",
+      "action": "Action",
+      "sceneHeading": "Scene Heading",
+      "character": "Character",
+      "dialogue": "Dialogue",
+      "parenthetical": "Parenthetical",
+      "transition": "Transition"
+    },
+
+    "chars": {
+      "searchPh": "Search character…",
+      "add": "+ Add character",
+      "empty": "No characters. Press “+ Add character”.",
+      "removed": "Character deleted.",
+      "namePh": "Character name",
+      "role": "Role",
+      "rolePh": "protagonist, antagonist, supporting…",
+      "age": "Age / Appearance",
+      "agePh": "apparent age, marks, look…",
+      "background": "Background",
+      "backgroundPh": "backstory, origins, context…",
+      "goal": "Goal",
+      "goalPh": "short/long-term wants…",
+      "conflict": "Conflict",
+      "conflictPh": "what stands in the way, internal/external…",
+      "arc": "Character arc",
+      "arcPh": "how they change across the story…",
+      "relations": "Relationships",
+      "relationsPh": "key ties, allies/enemies…",
+      "traits": "Personality traits",
+      "traitsPh": "short list: witty, cynical…",
+      "quote": "Quote",
+      "quotePh": "line that represents them",
+      "notes": "Notes",
+      "notesPh": "notes, ideas, loose details…"
+    },
+
+    "outline": {
+      "searchPh": "Search beat…",
+      "groupBy": "Group by:",
+      "group": {
+        "none": "None",
+        "container": "Container"
+      },
+      "add": "+ New beat",
+      "empty": "No beats. Press “+ New beat”.",
+      "titlePh": "Beat title",
+      "summary": "Short summary",
+      "summaryPh": "2–3 lines about the beat…",
+      "objective": "Objective",
+      "objectivePh": "what the protagonist wants in this beat…",
+      "obstacle": "Conflict / Obstacle",
+      "obstaclePh": "what gets in the way…",
+      "outcome": "Outcome / Change",
+      "outcomePh": "what changes at the end of the beat…",
+      "timePlace": "Time & Place",
+      "timePlacePh": "day/night, place, interior/exterior…",
+      "characters": "Characters",
+      "charactersPh": "involved (comma-separated)…",
+      "links": "Links",
+      "linksPh": "timeline, characters, references…",
+      "container": {
+        "chapter": "Chapter",
+        "quadro": "Tableau",
+        "sequence": "Sequence"
+      },
+      "withoutName": "without name",
+      "removed": "Beat deleted."
+    },
+
+    "custom": {
+      "add": "Add custom section",
+      "addShort": "+ Section",
+      "section": "Custom section",
+      "textPh": "Text…",
+      "removed": "Section removed."
+    },
+
+    "bible": {
+      "searchPh": "Search the Bible sections…",
+      "empty": "No sections found.",
+      "sectionRemoved": "Bible section deleted.",
+
+      "title": "TITLE",
+      "author": "AUTHOR",
+      "pitch": "PITCH / LOGLINE",
+      "premise": "PREMISE",
+      "synShort": "SHORT SYNOPSIS",
+      "synLong": "EXTENDED SYNOPSIS",
+      "themes": "THEMES",
+      "tone": "TONE & STYLE",
+      "world": "WORLD / SETTING",
+      "rules": "WORLD RULES",
+      "locations": "KEY LOCATIONS",
+      "period": "TIME PERIOD",
+      "structureNotes": "STRUCTURE",
+      "motifs": "MOTIFS & SYMBOLS",
+      "props": "KEY PROPS",
+      "references": "REFERENCES & MOODBOARD",
+      "structure": "STRUCTURE",
+      "refs": "REFERENCES & MOODBOARD",
+      "biblio": "SOURCES & BIBLIOGRAPHY",
+      "questions": "OPEN QUESTIONS",
+
+      "production": "PRODUCTION NOTES",
+      "glossary": "GLOSSARY",
+      "bibliography": "SOURCES & BIBLIOGRAPHY",
+      "openQuestions": "OPEN QUESTIONS",
+
+      "ph": {
+        "title": "Project title, optional subtitle…",
+        "author": "Author(s) name(s), contacts, role…",
+        "pitch": "One or two lines that capture the story’s heart…",
+        "premise": "Core idea / what-if, general tone…",
+        "synShort": "5–10 lines covering the story start to finish…",
+        "synLong": "2–3 paragraphs: setup, development, climax, ending…",
+        "themes": "Major themes (growth, guilt, redemption…), why they matter…",
+        "tone": "Register (drama, dark comedy…), rhythm, reference works…",
+        "world": "Social/historical context, cultural norms, peculiarities…",
+        "rules": "Magic/tech/supernatural: what’s possible and what isn’t…",
+        "locations": "Main sets and their narrative function…",
+        "period": "Era, time span, macro chronology…",
+        "structure": "3 acts / 5 acts / 8 sequences… key turning points…",
+        "motifs": "Recurring objects, guiding images, colors…",
+        "props": "Important physical elements and their meaning…",
+        "refs": "Similar works, palette, (text) links…",
+        "production": "Constraints, audience, rating, formats…",
+        "glossary": "Internal terms, proper names with definitions…",
+        "biblio": "Books, articles, interviews, research…",
+        "questions": "Open doubts to resolve, things to test…"
+      }
+    }
+  }
+}

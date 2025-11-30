@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor - One Scriba</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body id="layoutRoot" class="light" data-sidebar-state="open">
+
+  
+  <!-- Toggle sidebar (sempre visibile, centrato) -->
+  <button id="sidebarToggle"
+          class="sidebar-toggle"
+          data-i18n-attr="aria-label:editor.sidebar.toggle"
+          aria-label="Chiudi barra"
+          aria-expanded="true"></button>
+
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar" id="sidebar">
+    <!-- Header progetto: solo nome -->
+    <div class="sidebar-header">
+      <div id="projectName" class="project-name">—</div>
+    </div>
+
+    <!-- Torna al menu -->
+    <button onclick="goBack()" id="backToMenuBtn" class="btn-with-icon"
+            data-i18n-attr="aria-label:editor.back"
+            aria-label="Torna al menu">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      <span data-i18n="editor.back">Torna al menu</span>
+    </button>
+
+    <div class="sidebar-sep" role="separator" aria-hidden="true"></div>
+
+    <!-- Sezioni -->
+    <div class="sections-split" id="sectionsSplit">
+      <button type="button"
+              id="sectionsMainBtn"
+              class="btn-with-icon"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-controls="sectionsMenu">
+        <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+        <span data-i18n="editor.sections">Sezioni</span>
+      </button>
+
+      <div id="sectionsMenu" class="menu" role="menu" hidden>
+        <!-- editor.js popola -->
+      </div>
+    </div>
+
+    <!-- Azioni -->
+    <div id="sidebarActions">
+
+      <!-- Versioni -->
+      <div class="export-split" id="versionsSplit">
+        <button type="button"
+                id="versionsMainBtn"
+                class="btn-with-icon"
+                data-i18n-attr="aria-label:editor.versions.open"
+                aria-label="Apri pannello versioni"
+                onclick="openVersionsPanel()">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+            <path d="M19 21H5a2 2 0 0 1-2-2V7" />
+            <path d="M7 3h10a2 2 0 0 1 2 2v14" />
+            <path d="M3 7h18" />
+            <path d="M8 11h8" />
+            <path d="M8 15h6" />
+          </svg>
+          <span data-i18n="editor.versions.title">Versioni</span>
+        </button>
+      </div>
+
+      <!-- Esporta -->
+      <div class="export-split" id="exportSplit">
+        <button type="button"
+                id="exportMainBtn"
+                class="btn-with-icon"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-controls="exportMenu">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+            <path d="M12 5v10"></path>
+            <polyline points="8 9 12 5 16 9"></polyline>
+            <path d="M4 19h16"></path>
+          </svg>
+          <span data-i18n="editor.export.title">Esporta</span>
+        </button>
+
+        <button type="button"
+                id="exportMenuToggle"
+                class="split-caret"
+                data-i18n-attr="aria-label:editor.export.openMenu"
+                aria-label="Apri menu esportazione"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-controls="exportMenu">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <div id="exportMenu" class="menu" role="menu" hidden>
+          <button role="menuitem" type="button" class="menu-item"
+                  onclick="exportCurrentSectionPDF()"
+                  data-i18n="editor.export.sectionPdf">Esporta sezione (PDF)</button>
+          <button role="menuitem" type="button" class="menu-item"
+                  onclick="exportFullPDF()"
+                  data-i18n="editor.export.projectPdf">Esporta progetto (PDF)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Editor ===== -->
+  <div class="editor" id="editorContainer">
+<div class="top-right-controls"
+     data-i18n-attr="aria-label:editor.settings"
+     aria-label="Impostazioni">
+
+  <!-- 🔍 Pulsanti Zoom -->
+  <button id="zoomOutBtn" class="zoom-btn" title="Zoom out (−)" aria-label="Zoom out">−</button>
+  <button id="zoomInBtn"  class="zoom-btn" title="Zoom in (+)" aria-label="Zoom in">+</button>
+
+  <!-- Solo lettura -->
+  <button onclick="toggleReadOnly()" id="readOnlyBtn"
+          data-i18n-attr="title:editor.readonly;aria-label:editor.readonly"
+          title="Solo lettura" aria-label="Solo lettura">
+    <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+      <path d="M7 10V7a5 5 0 1 1 10 0v3" />
+      <rect x="5" y="10" width="14" height="10" rx="2" />
+    </svg>
+  </button>
+
+  <!-- Tema -->
+  <button onclick="toggleTheme()"
+          data-i18n-attr="title:editor.theme;aria-label:editor.theme"
+          title="Cambia tema" aria-label="Cambia tema">
+    <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  </button>
+</div>
+
+
+    <!-- Toolbar testo -->
+    <div id="formatToolbar" role="toolbar" class="toolbar--single"
+         data-i18n-attr="aria-label:editor.toolbar.text"
+         aria-label="Barra di formattazione">
+      <div class="tb-left">
+        <button type="button" class="tb-btn" data-cmd="bold"
+                data-i18n-attr="title:editor.toolbar.bold;aria-label:editor.toolbar.bold"
+                title="Grassetto (Ctrl+B)" aria-label="Grassetto"><strong>B</strong></button>
+        <button type="button" class="tb-btn" data-cmd="italic"
+                data-i18n-attr="title:editor.toolbar.italic;aria-label:editor.toolbar.italic"
+                title="Corsivo (Ctrl+I)" aria-label="Corsivo"><em>I</em></button>
+        <button type="button" class="tb-btn" data-cmd="underline"
+                data-i18n-attr="title:editor.toolbar.underline;aria-label:editor.toolbar.underline"
+                title="Sottolineato (Ctrl+U)" aria-label="Sottolineato"><u>U</u></button>
+        <span class="tb-sep" aria-hidden="true"></span>
+        <button type="button" class="tb-btn" data-cmd="decreaseFont"
+                data-i18n-attr="title:editor.toolbar.decFont;aria-label:editor.toolbar.decFont"
+                title="Diminuisci dimensione" aria-label="Diminuisci dimensione">A−</button>
+        <button type="button" class="tb-btn" data-cmd="normalFont"
+                data-i18n-attr="title:editor.toolbar.normFont;aria-label:editor.toolbar.normFont"
+                title="Dimensione normale" aria-label="Dimensione normale">A</button>
+        <button type="button" class="tb-btn" data-cmd="increaseFont"
+                data-i18n-attr="title:editor.toolbar.incFont;aria-label:editor.toolbar.incFont"
+                title="Aumenta dimensione" aria-label="Aumenta dimensione">A+</button>
+      </div>
+      <div class="tb-right">
+        <button type="button" class="tb-btn" data-cmd="insertUnorderedList"
+                data-i18n-attr="title:editor.toolbar.bullets;aria-label:editor.toolbar.bullets"
+                title="Elenco puntato" aria-label="Elenco puntato">•</button>
+        <button type="button" class="tb-btn" data-cmd="insertOrderedList"
+                data-i18n-attr="title:editor.toolbar.numbers;aria-label:editor.toolbar.numbers"
+                title="Elenco numerato" aria-label="Elenco numerato">1.</button>
+        <button type="button" class="tb-btn" data-cmd="indent"
+                data-i18n-attr="title:editor.toolbar.indent;aria-label:editor.toolbar.indent"
+                title="Aumenta rientro" aria-label="Aumenta rientro">↳</button>
+        <button type="button" class="tb-btn" data-cmd="outdent"
+                data-i18n-attr="title:editor.toolbar.outdent;aria-label:editor.toolbar.outdent"
+                title="Riduci rientro" aria-label="Riduci rientro">↲</button>
+        <span class="tb-sep" aria-hidden="true"></span>
+        <button type="button" class="tb-btn" data-cmd="undo"
+                data-i18n-attr="title:editor.toolbar.undo;aria-label:editor.toolbar.undo"
+                title="Annulla" aria-label="Annulla">↩</button>
+        <button type="button" class="tb-btn" data-cmd="redo"
+                data-i18n-attr="title:editor.toolbar.redo;aria-label:editor.toolbar.redo"
+                title="Ripeti" aria-label="Ripeti">↪</button>
+      </div>
+    </div>
+
+    <!-- Toolbar timeline -->
+    <div id="timelineToolbar" class="tl-toolbar" role="toolbar"
+         data-i18n-attr="aria-label:editor.timeline.tools"
+         aria-label="Strumenti timeline" style="display:none;">
+      <button type="button" id="tlAddEvent" class="tl-btn" data-i18n="editor.timeline.addEvent">+ Evento</button>
+      <span class="tl-sep"></span>
+      <button type="button" id="tlZoomOut" class="tl-btn" title="Zoom -" aria-label="Zoom -"
+              data-i18n-attr="title:editor.timeline.zoomOut;aria-label:editor.timeline.zoomOut">−</button>
+      <span id="tlZoomDisplay" class="tl-zoom">100%</span>
+      <button type="button" id="tlZoomIn" class="tl-btn" title="Zoom +" aria-label="Zoom +"
+              data-i18n-attr="title:editor.timeline.zoomIn;aria-label:editor.timeline.zoomIn">+</button>
+    </div>
+
+    <!-- Timeline -->
+    <div id="timelineContainer" style="display:none;">
+      <div id="timelineViewport" tabindex="0"
+           data-i18n-attr="aria-label:editor.timeline.viewport"
+           aria-label="Timeline orizzontale">
+        <div id="timelineTrack" aria-live="polite"></div>
+      </div>
+    </div>
+
+<!-- Selettore modalità (solo Scene) -->
+<div class="mode-selector" id="modeSelector">
+  <select id="writingMode" data-i18n-attr="aria-label:editor.mode.label" aria-label="Modalità scrittura scena">
+    <option value="scene-heading"   data-i18n="editor.mode.sceneHeading">Intestazione Scena</option>
+    <option value="action"          data-i18n="editor.mode.action">Azione</option>
+    <option value="character"       data-i18n="editor.mode.character">Personaggio</option>
+    <option value="dialogue"        data-i18n="editor.mode.dialogue">Dialogo</option>
+    <option value="parenthetical"   data-i18n="editor.mode.parenthetical">Parentetica</option>
+    <option value="transition"      data-i18n="editor.mode.transition">Transizione</option>
+  </select>
+</div>
+
+
+    <!-- Area editor -->
+    <div id="editorArea"></div>
+  </div>
+
+  <!-- Template evento timeline -->
+  <template id="tlEventTemplate">
+    <div class="tl-card" draggable="true" role="group"
+         data-i18n-attr="aria-label:editor.timeline.event"
+         aria-label="Evento timeline">
+      <button class="tl-card-close"
+              data-i18n-attr="title:editor.common.delete;aria-label:editor.common.delete"
+              title="Elimina" aria-label="Elimina evento">✕</button>
+      <div class="tl-card-title" contenteditable="true"
+           data-i18n-attr="data-placeholder:editor.timeline.titlePh"
+           data-placeholder="Titolo"></div>
+      <div class="tl-card-desc"  contenteditable="true"
+           data-i18n-attr="data-placeholder:editor.timeline.descPh"
+           data-placeholder="Descrizione"></div>
+    </div>
+  </template>
+
+<!-- i18n prima di editor.js -->
+<script defer src="i18n.js"></script>
+<script defer src="editor.js"></script>
+</body>
+</html>

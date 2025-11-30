@@ -1,0 +1,51 @@
+{
+  "name": "one-scriba",
+  "version": "1.0.0",
+  "description": "Desktop app for creative writing and storytelling.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "keywords": ["writing", "screenplay", "book", "theatre"],
+  "author": "Tommaso",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^37.2.5",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "fountain-js": "^1.2.4",
+    "fs-extra": "^11.3.1",
+    "pdfkit": "^0.17.1"
+  },
+  "build": {
+    "productName": "One Scriba",
+    "appId": "com.onescriba.desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets/"
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icons/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icons/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icons/icon.png"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scriptum – Tipo di Progetto</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    button {
+      padding: 14px 32px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #222;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 250px;
+      text-align: center;
+    }
+
+    button:focus-visible {
+      outline: 2px solid #101010;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 2px rgba(16, 16, 16, 0.12);
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>Benvenuto su Scriptum</h1>
+  <p>Seleziona il tipo di progetto da creare o modificare</p>
+
+  <div class="buttons">
+    <button onclick="selezionaTipo('sceneggiatura')">Sceneggiatura</button>
+    <button onclick="selezionaTipo('libro')">Libro</button>
+    <button onclick="selezionaTipo('teatro')">Opera Teatrale</button>
+  </div>
+
+  <script>
+    function selezionaTipo(tipo) {
+      localStorage.setItem('projectType', tipo);
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

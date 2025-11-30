@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Scriba - Seleziona Progetto</title>
+  <style>
+    :root{ --bg:#f4f4f4;--card:#fff;--text:#222;--muted:#555;--btn:#222;--btn-hover:#444;--border:#ddd }
+    *{box-sizing:border-box}
+    body{
+      font-family:'Segoe UI',system-ui,-apple-system,Roboto,'Helvetica Neue',Arial,sans-serif;
+      background:var(--bg);color:var(--text);margin:0;padding:40px 24px;max-width:900px;margin-inline:auto
+    }
+    h1{font-size:32px;margin:0 0 20px}
+
+    /* topbar lingua */
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:12px
+    }
+    .lang-wrap{ position: relative; }
+    .lang-btn{
+      font-size:14px;background:#fff;color:var(--text);border:1px solid var(--border);
+      border-radius:8px;padding:8px 10px;cursor:pointer;min-width:44px;text-align:center
+    }
+.lang-menu{
+  position:absolute; right:0; top:calc(100% + 6px);
+  background:#fff; color:#222;
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.10);
+  padding:8px; display:none; min-width:200px;
+  z-index:10;
+}
+.lang-menu.open{ display:block; }
+.lang-menu h4{
+  font-size:12px; margin:6px 8px 8px;
+  color:#666; font-weight:600;
+}
+.lang-item{
+  width:100%; text-align:left;
+  background:#fff;                        /* bianco */
+  color:#333;                             /* testo un filo più scuro */
+  border:1px solid #e7e7e7;               /* bordo leggero */
+  border-radius:10px;
+  padding:10px 12px; cursor:pointer; font-weight:600;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.lang-item:hover{
+  background:#fafafa;                     /* hover chiarissimo */
+  border-color:#dddddd;
+}
+.lang-item:focus-visible{
+  outline:2px solid #cfe3ff;              /* focus ring soft e accessibile */
+  outline-offset:2px;
+}
+
+
+
+    /* barra nuova in alto */
+    .new-project{
+      background:var(--card);border:1px solid var(--border);border-radius:10px;
+      padding:16px;display:grid;grid-template-columns:1fr 220px auto;gap:10px;align-items:center;margin-bottom:24px
+    }
+    input,select,button{
+      font-size:16px;border-radius:8px;border:1px solid var(--border);padding:10px 14px
+    }
+    button{background:var(--btn);color:#fff;border:none;cursor:pointer;transition:background .2s ease}
+    button:hover{background:var(--btn-hover)}
+    input:focus,select:focus,button:focus-visible{
+      outline:2px solid #101010;
+      outline-offset:2px;
+      border-color:#101010;
+      box-shadow:0 0 0 2px rgba(16,16,16,0.12);
+    }
+    .btn-outline{background:#fff;color:var(--text);border:1px solid var(--border)}
+    .btn-outline:hover{background:#f1f1f1}
+    .btn-light{background:#fff;color:var(--text);border:1px solid var(--border)}
+    .btn-danger{background:#000;color:#fff;border:1px solid var(--border)}
+
+    .project-list{display:grid;gap:10px}
+    .project-row{
+      background:var(--card);border:1px solid var(--border);border-radius:10px;
+      padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px
+    }
+    .project-name{font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .project-actions{display:flex;gap:8px}
+    .icon-btn{
+      background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;width:36px;height:36px;
+      display:grid;place-items:center;cursor:pointer
+    }
+    .icon-btn:hover{background:#f6f6f6}
+    .project-icon{width:22px;height:22px}
+    .action-icon{width:18px;height:18px}
+
+    .empty{color:var(--muted);background:#fff;border:1px dashed var(--border);padding:18px;border-radius:10px;text-align:center}
+
+    .rename-wrap{display:flex;gap:8px;align-items:center;width:100%}
+    .rename-input{flex:1;min-width:140px}
+    @media (max-width:700px){
+      .new-project{grid-template-columns:1fr}
+      .project-row{grid-template-columns:1fr}
+      .project-actions{justify-content:flex-start}
+    }
+
+    /* --- Riga in attesa di eliminazione (disabilitata) --- */
+    .project-row.pending-delete{ opacity:.6; filter:saturate(.3); }
+    .project-row.pending-delete *{ pointer-events:none; }
+
+    /* === Toast undo stack (multi) === */
+    .toast-host{
+      position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+      display:flex; flex-direction:column; gap:8px; z-index:3000;
+      pointer-events:none;
+    }
+    .toast{
+      pointer-events:auto; display:inline-flex; align-items:center; gap:10px;
+      background:#111; color:#fff; padding:10px 14px;
+      border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.16); font-size:14px; line-height:1.3;
+    }
+    .toast .toast-undo{
+      background:transparent; color:#fff; border:1px solid rgba(255,255,255,.6);
+      border-radius:6px; padding:4px 8px; cursor:pointer;
+    }
+    .toast .toast-undo:hover{ background:rgba(255,255,255,.08); }
+    .toast .toast-close{
+      background:transparent; color:inherit; border:none; cursor:pointer; font-size:16px; padding:0 2px;
+    }
+    .toast.light{
+      background:#fff; color:#222; border-color:#ddd; box-shadow:0 6px 18px rgba(0,0,0,.18);
+    }
+    .toast.light .toast-undo{ color:#222; border-color:#999; }
+    .toast.light .toast-undo:hover{ background:#f3f3f3; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 data-i18n="home.title">I tuoi progetti</h1>
+
+    <!-- Pulsante lingua -->
+    <div class="lang-wrap">
+      <button id="langBtn" class="lang-btn" aria-haspopup="true" aria-expanded="false"
+              data-i18n="home.langButton" data-i18n-attr="aria-label:home.langMenu.title">IT</button>
+      <div id="langMenu" class="lang-menu" role="menu" aria-label="Change language">
+        <h4 data-i18n="home.langMenu.title">Cambia lingua</h4>
+       <button class="lang-item" data-lang="it"><span data-i18n="home.langMenu.it">Italiano</span></button>
+       <button class="lang-item" data-lang="en"><span data-i18n="home.langMenu.en">English</span></button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Form creazione in alto -->
+  <div class="new-project">
+    <input type="text" id="newProjectName"
+           data-i18n-attr="placeholder:home.newProjectName.placeholder"
+           placeholder="Nome nuovo progetto" />
+
+    <select id="projectType" data-i18n-attr="aria-label:home.projectType.label" aria-label="Tipo di progetto">
+      <option value="sceneggiatura" data-i18n="home.types.sceneggiatura">Sceneggiatura</option>
+      <option value="teatro"        data-i18n="home.types.teatro">Opera Teatrale</option>
+      <option value="libro"         data-i18n="home.types.libro">Libro</option>
+    </select>
+
+    <button id="createBtn" data-i18n="home.create">Crea progetto</button>
+  </div>
+
+  <div class="project-list" id="projectList">
+    <p class="empty" data-i18n="home.loading">Caricamento progetti…</p>
+  </div>
+
+  <!-- i18n -->
+  <script src="./i18n.js"></script>
+
+  <script>
+    const { ipcRenderer } = window.electron;
+
+
+    /* ============ Toast undo utilities (i18n) ============ */
+    function ensureToastHost(){
+      let host = document.getElementById('toastHost');
+      if(!host){
+        host = document.createElement('div');
+        host.id = 'toastHost';
+        host.className = 'toast-host';
+        document.body.appendChild(host);
+      }
+      return host;
+    }
+    function pushUndoToast(message, opts={}){
+      const { duration=8000, onUndo=null, onExpire=null, light=true } = opts;
+      const host = ensureToastHost();
+
+      const tdiv = document.createElement('div');
+      tdiv.className = 'toast' + (light ? ' light' : '');
+
+      const msg = document.createElement('span');
+      msg.textContent = message;
+
+      const undo = document.createElement('button');
+      undo.className = 'toast-undo';
+      undo.textContent = I18N.t('undo.undo'); // i18n
+
+      const close = document.createElement('button');
+      close.className = 'toast-close';
+      close.setAttribute('aria-label', I18N.t('undo.close'));
+      close.textContent = '×';
+
+      tdiv.appendChild(msg);
+      tdiv.appendChild(undo);
+      tdiv.appendChild(close);
+      host.appendChild(tdiv);
+
+      let cleared = false;
+      let timer = setTimeout(expire, duration);
+
+      function cleanup(){
+        if(cleared) return;
+        cleared = true;
+        clearTimeout(timer);
+        tdiv.remove();
+      }
+      function expire(){
+        cleanup();
+        if(typeof onExpire === 'function') onExpire();
+      }
+
+      undo.addEventListener('click', ()=>{ cleanup(); if(typeof onUndo === 'function') onUndo(); });
+      close.addEventListener('click', cleanup);
+
+      tdiv.addEventListener('mouseenter', ()=>{ clearTimeout(timer); });
+      tdiv.addEventListener('mouseleave', ()=>{ if(!cleared) timer = setTimeout(expire, 2000); });
+
+      return { dismiss: cleanup };
+    }
+
+    function notifyError(msg){
+      pushUndoToast(msg, { duration: 5000, light: true });
+    }
+
+    // Percorsi icone
+    const ICONS = {
+      sceneggiatura: 'icons/ciak.svg',
+      teatro:        'icons/maschere.svg',
+      libro:         'icons/libro.svg',
+      open:          'icons/freccia.svg',
+      delete:        'icons/cestino.svg',
+      rename:        'icons/matita.svg'
+    };
+
+    function makeIcon(src, alt, cls){
+      const img = document.createElement('img');
+      img.src = src; img.alt = alt || ''; img.className = cls || '';
+      img.onerror = () => {};
+      return img;
+    }
+
+    // ---- RENDER LISTA ----
+    async function loadProjects(){
+      const list = await ipcRenderer.invoke('list-projects'); // [{id,name,type}]
+      const container = document.getElementById('projectList');
+      container.innerHTML = '';
+
+      if(!list || list.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = I18N.t('home.empty');
+        container.appendChild(empty);
+        return;
+      }
+
+      for (const item of list){
+        container.appendChild(renderRow(item.id, item.name, item.type));
+      }
+    }
+
+    function renderRow(id, name, type){
+      const row = document.createElement('div');
+      row.className = 'project-row';
+      row.dataset.id = id;
+
+      const typeImg = makeIcon(ICONS[type] || '', type || 'progetto', 'project-icon');
+
+      const title = document.createElement('div');
+      title.className = 'project-name';
+      title.textContent = name;
+
+      const actions = document.createElement('div');
+      actions.className = 'project-actions';
+
+      // Apri
+      const openBtn = document.createElement('button');
+      openBtn.className = 'icon-btn';
+      openBtn.title = I18N.t('actions.open');
+      openBtn.appendChild(makeIcon(ICONS.open, I18N.t('actions.open'), 'action-icon'));
+      openBtn.onclick = (e)=>{ e.stopPropagation(); openProject(id, name); };
+
+      // Rinomina
+      const renameBtn = document.createElement('button');
+      renameBtn.className = 'icon-btn';
+      renameBtn.title = I18N.t('actions.rename');
+      renameBtn.appendChild(makeIcon(ICONS.rename, I18N.t('actions.rename'), 'action-icon'));
+      renameBtn.onclick = (e)=>{ e.stopPropagation(); switchToRename(row, id, name, type); };
+
+      // Elimina
+      const delBtn = document.createElement('button');
+      delBtn.className = 'icon-btn';
+      delBtn.title = I18N.t('actions.delete');
+      delBtn.appendChild(makeIcon(ICONS.delete, I18N.t('actions.delete'), 'action-icon'));
+      delBtn.onclick = (e)=>{
+        e.stopPropagation();
+        if (row.classList.contains('pending-delete')) return;
+        row.classList.add('pending-delete');
+
+        pushUndoToast(I18N.t('toasts.deleted', { name }), {
+          duration: 8000,
+          light: true,
+          onUndo: () => { row.classList.remove('pending-delete'); },
+          onExpire: async () => {
+            try{
+              const res = await ipcRenderer.invoke('delete-project', id);
+              if(!res || !res.success){
+                pushUndoToast(I18N.t('toasts.deleteError', { msg: (res?.error || 'unknown') }), { duration: 5000, light:true });
+                row.classList.remove('pending-delete');
+                return;
+              }
+              await loadProjects();
+            }catch(err){
+              pushUndoToast(I18N.t('toasts.deleteError', { msg: (err?.message || err || 'unknown') }), { duration: 5000, light:true });
+              row.classList.remove('pending-delete');
+            }
+          }
+        });
+      };
+
+      actions.appendChild(openBtn);
+      actions.appendChild(renameBtn);
+      actions.appendChild(delBtn);
+
+      row.appendChild(typeImg);
+      row.appendChild(title);
+      row.appendChild(actions);
+      return row;
+    }
+
+    function switchToRename(row, id, currentDisplayName, type){
+      row.innerHTML = '';
+
+      const typeImg = makeIcon(ICONS[type] || '', type || 'progetto', 'project-icon');
+
+      const wrap = document.createElement('div');
+      wrap.className = 'rename-wrap';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentDisplayName;
+      input.className = 'rename-input';
+      input.setAttribute('aria-label','Nuovo nome progetto'); // opzionale: potremmo i18n-izzarlo
+
+      setTimeout(()=>{ input.focus({ preventScroll:true }); input.select(); }, 0);
+
+      input.addEventListener('keydown', (e)=>{
+        e.stopPropagation();
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          doRename(row, id, input.value.trim(), type);
+        }else if(e.key === 'Escape'){
+          e.preventDefault();
+          restoreRow(row, id, currentDisplayName, type);
+        }
+      });
+
+      const actions = document.createElement('div');
+      actions.className = 'project-actions';
+
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn-light';
+      saveBtn.textContent = I18N.t('buttons.save');
+      saveBtn.onclick = (e)=>{
+        e.stopPropagation();
+        doRename(row, id, input.value.trim(), type);
+      };
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn-outline';
+      cancelBtn.textContent = I18N.t('buttons.cancel');
+      cancelBtn.onclick = (e)=>{
+        e.stopPropagation();
+        restoreRow(row, id, currentDisplayName, type);
+      };
+
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+
+      wrap.appendChild(input);
+
+      row.appendChild(typeImg);
+      row.appendChild(wrap);
+      row.appendChild(actions);
+    }
+
+    async function doRename(row, id, newDisplayName, type){
+      if(!newDisplayName){
+        notifyError(I18N.t('errors.emptyName'));
+        const input = row.querySelector('.rename-input');
+        if(input){ setTimeout(()=>{ input.focus({ preventScroll:true }); }, 0); }
+        return;
+      }
+      try{
+        const res = await ipcRenderer.invoke('rename-project', id, newDisplayName);
+        if(!res || !res.success){
+          notifyError(I18N.t('toasts.renameError', { msg: (res?.error || 'unknown') }));
+          const input = row.querySelector('.rename-input');
+          if(input) setTimeout(()=>input.focus({ preventScroll:true }), 0);
+          return;
+        }
+        await loadProjects();
+      }catch(err){
+        notifyError(I18N.t('toasts.renameError', { msg: (err?.message || err || 'unknown') }));
+        const input = row.querySelector('.rename-input');
+        if(input) setTimeout(()=>input.focus({ preventScroll:true }), 0);
+      }
+    }
+
+    function restoreRow(row, id, displayName, type){
+      const fresh = renderRow(id, displayName, type);
+      row.replaceWith(fresh);
+    }
+
+    function openProject(id, displayName){
+      localStorage.setItem('currentProject', id);
+      localStorage.setItem('currentProjectName', displayName || '');
+      window.location.href = 'editor.html';
+    }
+
+    // Creazione nuovo progetto
+    let creating = false;
+    async function createNewProject(){
+      if (creating) return;
+      creating = true;
+
+      const nameInput = document.getElementById('newProjectName');
+      const typeSel   = document.getElementById('projectType');
+      const btn       = document.getElementById('createBtn');
+
+      const name = (nameInput.value || '').trim();
+      const type = typeSel.value;
+
+      if (!name){
+        notifyError(I18N.t('errors.enterValidName'));
+        nameInput.focus({ preventScroll:true });
+        creating = false;
+        return;
+      }
+
+      btn.disabled = true;
+
+      try{
+        const res = await ipcRenderer.invoke('create-project', name, type);
+        if(!res || res.success !== true){
+          notifyError(res?.error ? I18N.t('toasts.createError', { msg: res.error }) : I18N.t('errors.createGeneric'));
+          nameInput.focus({ preventScroll:true });
+          return;
+        }
+        localStorage.setItem('currentProject', res.id);
+        localStorage.setItem('currentProjectName', res.name || name);
+        window.location.href = 'editor.html';
+      }catch(err){
+        notifyError(I18N.t('toasts.createError', { msg: (err?.message || String(err)) }));
+        nameInput.focus({ preventScroll:true });
+      }finally{
+        if (document.body) {
+          btn.disabled = false;
+          creating = false;
+        }
+      }
+    }
+
+    document.getElementById('createBtn').addEventListener('click', createNewProject);
+
+    const nameInputForEnter = document.getElementById('newProjectName');
+    nameInputForEnter.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        createNewProject();
+      }
+    });
+
+    // ====== Lingua: init + UI ======
+    const langBtn  = document.getElementById('langBtn');
+    const langMenu = document.getElementById('langMenu');
+
+    function setBtnLabelFor(lang){
+      // Mostra il codice breve (IT / EN)
+      langBtn.textContent = (lang || 'it').toUpperCase();
+      // aggiorna aria-expanded
+      langBtn.setAttribute('aria-expanded', langMenu.classList.contains('open') ? 'true' : 'false');
+    }
+
+    langBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      langMenu.classList.toggle('open');
+      langBtn.setAttribute('aria-expanded', langMenu.classList.contains('open') ? 'true' : 'false');
+    });
+    document.addEventListener('click', ()=>{ langMenu.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); });
+
+    langMenu.querySelectorAll('.lang-item').forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        const lang = btn.getAttribute('data-lang');
+        await I18N.setLang(lang);
+        setBtnLabelFor(lang);
+        try { await ipcRenderer.invoke('set-language', lang); } catch {}
+        // ricarica lista per rinfrescare tooltip/titoli già creati
+        await loadProjects();
+      });
+    });
+
+    async function initLanguage(){
+      // 1) prova dal main
+      let lang = null;
+      try { lang = await ipcRenderer.invoke('get-language'); } catch {}
+      // 2) poi localStorage
+      if(!lang) lang = localStorage.getItem('uiLang');
+      // 3) poi navigator
+      if(!lang) {
+        const nav = (navigator.language || 'it').slice(0,2).toLowerCase();
+        lang = (nav === 'en') ? 'en' : 'it';
+      }
+      await I18N.setLang(lang);
+      setBtnLabelFor(lang);
+    }
+
+    // Avvio
+    (async () => {
+      await initLanguage();
+      await loadProjects();
+    })();
+  </script>
+</body>
+</html>

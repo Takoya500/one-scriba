@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Scriba – Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #222;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    input {
+      padding: 12px;
+      width: 280px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    input:focus,
+    button:focus-visible {
+      outline: 2px solid #101010;
+      outline-offset: 2px;
+      border-color: #101010;
+      box-shadow: 0 0 0 2px rgba(16, 16, 16, 0.12);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 32px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #222;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+
+    .lang-toggle {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 14px;
+      color: #777;
+      cursor: pointer;
+    }
+
+    .lang-toggle:hover {
+      color: #000;
+    }
+
+    .error {
+      color: #c00;
+      margin-top: 10px;
+      font-size: 14px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-toggle" id="toggleLang">IT</div>
+
+  <h1 id="title">Welcome to One Scriba</h1>
+  <p id="desc">Please enter your license key to continue.</p>
+
+  <input id="licenseInput" type="text" placeholder="Enter license key" />
+  <button id="loginBtn">Continue</button>
+  <div class="error" id="errorMsg"></div>
+
+  <script>
+    // === Impostazioni lingua ===
+    const langs = {
+      en: {
+        title: "Welcome to One Scriba",
+        desc: "Please enter your license key to continue.",
+        placeholder: "Enter license key",
+        btn: "Continue",
+        error: "Invalid license key."
+      },
+      it: {
+        title: "Benvenuto in One Scriba",
+        desc: "Inserisci la tua chiave di licenza per continuare.",
+        placeholder: "Inserisci la chiave di licenza",
+        btn: "Continua",
+        error: "Chiave non valida."
+      }
+    };
+
+    let lang = localStorage.getItem("lang") || "en";
+    const t = langs[lang];
+    const title = document.getElementById("title");
+    const desc = document.getElementById("desc");
+    const input = document.getElementById("licenseInput");
+    const button = document.getElementById("loginBtn");
+    const errorMsg = document.getElementById("errorMsg");
+    const toggle = document.getElementById("toggleLang");
+
+    function updateLang() {
+      title.textContent = langs[lang].title;
+      desc.textContent = langs[lang].desc;
+      input.placeholder = langs[lang].placeholder;
+      button.textContent = langs[lang].btn;
+      toggle.textContent = lang === "en" ? "IT" : "EN";
+      localStorage.setItem("lang", lang);
+    }
+
+    toggle.addEventListener("click", () => {
+      lang = lang === "en" ? "it" : "en";
+      updateLang();
+    });
+
+    updateLang();
+
+    // === Chiavi sviluppatore ===
+    const DEV_KEYS = ["TOMMASO-ACCESS", "FRIEND-001", "FRIEND-002"];
+
+    // === Accesso ===
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const key = input.value.trim();
+
+      // accesso sviluppatore
+      if (DEV_KEYS.includes(key)) {
+        localStorage.setItem("license", key);
+        localStorage.setItem("licenseType", "developer");
+        window.location.href = "index.html";
+        return;
+      }
+
+      // (in futuro: verifica API LemonSqueezy qui)
+      if (key.length < 8) {
+        errorMsg.textContent = langs[lang].error;
+        return;
+      }
+
+      // accettazione provvisoria per test
+      localStorage.setItem("license", key);
+      localStorage.setItem("licenseType", "user");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

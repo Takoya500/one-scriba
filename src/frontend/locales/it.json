@@ -1,0 +1,289 @@
+{
+  "home": {
+    "title": "I tuoi progetti",
+    "newProjectName": { "placeholder": "Nome nuovo progetto" },
+    "projectType": { "label": "Tipo di progetto" },
+    "types": {
+      "sceneggiatura": "Sceneggiatura",
+      "teatro": "Opera Teatrale",
+      "libro": "Libro"
+    },
+    "create": "Crea progetto",
+    "loading": "Caricamento progetti…",
+    "empty": "Nessun progetto. Creane uno qui sopra.",
+    "langButton": "IT",
+    "langMenu": { "title": "Cambia lingua", "it": "Italiano", "en": "English" }
+  },
+
+  "actions": { "open": "Apri", "rename": "Rinomina", "delete": "Elimina" },
+  "buttons": { "save": "Salva", "cancel": "Annulla" },
+  "undo": { "undo": "Annulla", "close": "Chiudi" },
+
+  "toasts": {
+    "deleted": "Progetto “{name}” eliminato.",
+    "deleteError": "Errore eliminazione: {msg}",
+    "renameError": "Errore rinomina: {msg}",
+    "createError": "Errore: {msg}"
+  },
+
+  "errors": {
+    "emptyName": "Il nome non può essere vuoto.",
+    "enterValidName": "Inserisci un nome valido.",
+    "createGeneric": "Errore nella creazione del progetto."
+  },
+
+  "common": {
+    "delete": "Elimina",
+    "create": "Crea",
+    "close": "Chiudi",
+    "cancel": "Annulla",
+    "undo": "Annulla",
+    "clear": "Pulisci ricerca",
+    "expand": "Espandi",
+    "collapse": "Compatta",
+    "moveUp": "Sposta su",
+    "moveDown": "Sposta giù",
+    "deleteSection": "Elimina sezione",
+    "loading": "Carico…",
+    "section": "sezione"
+  },
+
+  "editor": {
+    "back": "Torna al menu",
+    "sidebar": {
+      "open": "Apri barra",
+      "close": "Chiudi barra",
+      "toggle": "Barra laterale"
+    },
+    "readonly": "Solo lettura",
+    "edit": "Modifica",
+    "theme": "Cambia tema",
+    "page": "Pagina",
+    "sections": "Sezioni",
+
+    "placeholder": {
+  "start": "Inizia a scrivere…"
+},
+
+
+    "sectionTitles": {
+      "scene": "Stesura",
+      "capitoli": "Stesura",
+      "concept": "Concept",
+      "soggetto": "Soggetto",
+      "trattamento": "Trattamento",
+      "scaletta": "Scaletta",
+      "bibbia": "Bibbia",
+      "personaggi": "Personaggi",
+      "timeline": "Timeline",
+      "note": "Note",
+      "outline": "Outline",
+      "didascalie": "Didascalie globali",
+      "soggetto_logline": "Soggetto & logline",
+      "premessa_sinossi": "Premessa & sinossi"
+    },
+
+    "export": {
+      "title": "Esporta",
+      "openMenu": "Apri menu esportazione",
+      "sectionPdf": "Esporta sezione (PDF)",
+      "projectPdf": "Esporta progetto (PDF)",
+      "okProject": "✅ PDF completo esportato.",
+      "okSection": "✅ PDF della sezione esportato.",
+      "canceled": "Operazione annullata.",
+      "err": "❌ Errore esportazione: "
+    },
+
+    "versions": {
+      "title": "Versioni",
+      "open": "Apri pannello versioni",
+      "labelPh": "Etichetta versione…",
+      "footer": "Le versioni sono snapshot in sola lettura del progetto. Puoi creare, ripristinare o eliminare versioni.",
+      "none": "Nessuna versione salvata.",
+      "loadErr": "Errore nel caricamento delle versioni.",
+      "untitled": "(senza titolo)",
+      "section": "sezione",
+      "restore": "Ripristina",
+      "snapshot": "Snapshot",
+      "created": "✅ Versione creata.",
+      "createErr": "❌ Errore creazione versione: ",
+      "restoreConfirm": "Ripristinare questa versione? Il contenuto attuale verrà sovrascritto.",
+      "restored": "✅ Versione ripristinata.",
+      "restoreErr": "❌ Errore ripristino: ",
+      "deleteConfirm": "Eliminare definitivamente questa versione?",
+      "deleted": "🗑️ Versione eliminata.",
+      "deleteErr": "❌ Errore eliminazione: "
+    },
+
+    "settings": "Impostazioni",
+
+    "toolbar": {
+      "text": "Barra di formattazione",
+      "bold": "Grassetto (Ctrl+B)",
+      "italic": "Corsivo (Ctrl+I)",
+      "underline": "Sottolineato (Ctrl+U)",
+      "decFont": "Diminuisci dimensione",
+      "normFont": "Dimensione normale",
+      "incFont": "Aumenta dimensione",
+      "bullets": "Elenco puntato",
+      "numbers": "Elenco numerato",
+      "indent": "Aumenta rientro",
+      "outdent": "Riduci rientro",
+      "undo": "Annulla",
+      "redo": "Ripeti"
+    },
+
+    "timeline": {
+      "tools": "Strumenti timeline",
+      "addEvent": "+ Evento",
+      "zoomOut": "Zoom -",
+      "zoomIn": "Zoom +",
+      "viewport": "Timeline orizzontale",
+      "titlePh": "Titolo evento…",
+      "descPh": "Descrizione…",
+      "noColor": "Senza colore",
+      "pickColor": "Scegli colore",
+      "drag": "Trascina",
+      "eventRemoved": "Evento timeline eliminato.",
+      "colors": {
+        "red": "Rosso (Conflitto)",
+        "blue": "Blu (Dialogo)",
+        "green": "Verde (Svolta)",
+        "yellow": "Giallo (Setup)",
+        "purple": "Viola (Climax)",
+        "white": "Bianco (Transizione)",
+        "black": "Nero (Flashback)",
+        "orange": "Arancione (Tensione)"
+      }
+    },
+
+    "mode": {
+      "label": "Modalità scrittura scena",
+      "action": "Azione",
+      "sceneHeading": "Intestazione Scena",
+      "character": "Personaggio",
+      "dialogue": "Dialogo",
+      "parenthetical": "Parentetica",
+      "transition": "Transizione"
+    },
+
+    "chars": {
+      "searchPh": "Cerca personaggio…",
+      "add": "+ Aggiungi personaggio",
+      "empty": "Nessun personaggio. Premi “+ Aggiungi personaggio”.",
+      "removed": "Personaggio eliminato.",
+      "namePh": "Nome del personaggio",
+      "role": "Ruolo",
+      "rolePh": "protagonista, antagonista, comprimario…",
+      "age": "Età / Aspetto",
+      "agePh": "età apparente, segni, look…",
+      "background": "Background",
+      "backgroundPh": "storia pregressa, origini, contesto…",
+      "goal": "Obiettivo",
+      "goalPh": "cosa vuole adesso / a lungo termine…",
+      "conflict": "Conflitto",
+      "conflictPh": "cosa lo ostacola, interno/esterno…",
+      "arc": "Arco narrativo",
+      "arcPh": "come cambia lungo la storia…",
+      "relations": "Relazioni",
+      "relationsPh": "legami chiave, alleati/nemici…",
+      "traits": "Tratti caratteriali",
+      "traitsPh": "elenco breve: ironico, cinico…",
+      "quote": "Citazione",
+      "quotePh": "frase/battuta che lo rappresenta",
+      "notes": "Note",
+      "notesPh": "appunti, idee, dettagli sparsi…"
+    },
+
+    "outline": {
+      "searchPh": "Cerca beat…",
+      "groupBy": "Raggruppa per:",
+      "group": {
+        "none": "Nessuno",
+        "container": "Contenitore"
+      },
+      "add": "+ Nuovo beat",
+      "empty": "Nessun beat. Premi “+ Nuovo beat”.",
+      "titlePh": "Titolo beat",
+      "summary": "Sintesi breve",
+      "summaryPh": "2-3 righe sul beat…",
+      "objective": "Obiettivo",
+      "objectivePh": "cosa vuole ottenere il protagonista in questo beat…",
+      "obstacle": "Conflitto / Ostacolo",
+      "obstaclePh": "cosa si mette di traverso…",
+      "outcome": "Esito / Cambio",
+      "outcomePh": "cosa cambia alla fine del beat…",
+      "timePlace": "Tempo & Luogo",
+      "timePlacePh": "giorno/notte, luogo, interni/esterni…",
+      "characters": "Personaggi",
+      "charactersPh": "coinvolti (nomi separati da virgola)…",
+      "links": "Collegamenti",
+      "linksPh": "timeline, personaggi, riferimenti…",
+      "container": {
+        "chapter": "Capitolo",
+        "quadro": "Quadro",
+        "sequence": "Sequenza"
+      },
+      "withoutName": "senza nome",
+      "removed": "Beat eliminato."
+    },
+
+    "custom": {
+      "add": "Aggiungi sezione personalizzata",
+      "addShort": "+ Sezione",
+      "section": "Sezione personalizzata",
+      "textPh": "Testo…",
+      "removed": "Sezione rimossa."
+    },
+
+    "bible": {
+      "searchPh": "Cerca nelle sezioni della Bibbia…",
+      "empty": "Nessuna sezione trovata.",
+      "sectionRemoved": "Sezione Bibbia eliminata.",
+
+      "title": "TITOLO",
+      "author": "AUTORE",
+      "pitch": "PITCH / LOGLINE",
+      "premise": "PREMESSA",
+      "synShort": "SINOSSI BREVE",
+      "synLong": "SINOSSI ESTESA",
+      "themes": "TEMI",
+      "tone": "TONO & STILE",
+      "world": "MONDO / AMBIENTAZIONE",
+      "rules": "REGOLE DEL MONDO",
+      "locations": "LUOGHI CHIAVE",
+      "period": "PERIODO/EPOCA",
+      "structureNotes": "STRUTTURA",
+      "motifs": "MOTIVI & SIMBOLI",
+      "props": "OGGETTI CHIAVE",
+      "references": "RIFERIMENTI & MOODBOARD",
+      "production": "NOTE DI PRODUZIONE",
+      "glossary": "GLOSSARIO",
+      "bibliography": "FONTI & BIBLIOGRAFIA",
+      "openQuestions": "QUESTIONI APERTE",
+
+      "ph": {
+        "title": "Titolo del progetto, eventuale sottotitolo…",
+        "author": "Nome/i autore/i, contatti, eventuale ruolo…",
+        "pitch": "Una o due frasi che catturano il cuore della storia…",
+        "premise": "Idea di fondo e “e se…?”, tono generale…",
+        "synShort": "5–10 righe sulla storia dall’inizio alla fine…",
+        "synLong": "2–3 paragrafi: setup, sviluppo, climax e finale…",
+        "themes": "Temi portanti (crescita, colpa, redenzione…), perché ti interessano…",
+        "tone": "Registro (dramma, commedia nera…), ritmo, opere di riferimento…",
+        "world": "Contesto sociale/storico, norme culturali, particolarità…",
+        "rules": "Magia/tecnologia/sovrannaturale: cosa è possibile e cosa no…",
+        "locations": "Set principali e loro funzione narrativa…",
+        "period": "Epoca, arco temporale, cronologia macro…",
+        "structure": "3 atti / 5 atti / 8 sequenze… snodi principali…",
+        "motifs": "Oggetti ricorrenti, immagini guida, colori…",
+        "props": "Elementi fisici importanti e loro significato…",
+        "refs": "Opere affini, palette, link (testuali)…",
+        "production": "Vincoli, target, rating, formati…",
+        "glossary": "Termini interni, nomi propri con definizione…",
+        "biblio": "Libri, articoli, interviste, ricerche…",
+        "questions": "Dubbi da risolvere, punti da testare…"
+      }
+    }
+  }
+}
