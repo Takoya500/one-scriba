@@ -8,6 +8,8 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
 
     steps:
       - name: Checkout repository
@@ -19,11 +21,9 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Windows installer
-        env:
-          ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
         run: npm run dist
 
       - name: Upload Windows artifact
@@ -34,6 +34,8 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    env:
+      ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
 
     steps:
       - name: Checkout repository
@@ -45,11 +47,9 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build macOS dmg
-        env:
-          ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
         run: npm run dist
 
       - name: Upload macOS artifact
