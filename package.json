@@ -45,10 +45,7 @@
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
       ],
       "icon": "assets/icons/icon.icns",
@@ -70,10 +67,6 @@
       "icon": "assets/icons/icon.png"
     },
 
-    "publish": [
-      {
-        "provider": "github"
-      }
-    ]
+    "publish": "never"
   }
 }
