@@ -19,9 +19,11 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Windows installer
+        env:
+          ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
         run: npm run dist
 
       - name: Upload Windows artifact
@@ -43,9 +45,11 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build macOS dmg
+        env:
+          ELECTRON_BUILDER_DISABLE_AUTO_PUBLISH: true
         run: npm run dist
 
       - name: Upload macOS artifact
@@ -67,6 +71,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-files/**/* 
+          files: release-files/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -25,22 +25,18 @@
     "directories": {
       "output": "dist"
     },
-
     "artifactName": "OneScriba-${version}-${os}.${ext}",
     "asar": true,
-
     "files": [
       "src/**/*",
       "package.json"
     ],
-
     "extraResources": [
       {
         "from": "assets/",
         "to": "assets/"
       }
     ],
-
     "mac": {
       "target": [
         {
@@ -55,18 +51,14 @@
       "entitlementsInherit": null,
       "artifactName": "OneScriba-macOS.${ext}"
     },
-
     "win": {
       "target": "nsis",
       "icon": "assets/icons/icon.ico",
       "artifactName": "OneScriba-Setup.${ext}"
     },
-
     "linux": {
       "target": "AppImage",
       "icon": "assets/icons/icon.png"
-    },
-
-    "publish": "never"
+    }
   }
 }
