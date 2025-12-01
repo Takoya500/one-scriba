@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder --publish=never"
   },
   "keywords": ["writing", "screenplay", "book", "theatre"],
   "author": "Tommaso",
@@ -22,21 +22,26 @@
   "build": {
     "productName": "One Scriba",
     "appId": "com.onescriba.desktop",
+
     "directories": {
       "output": "dist"
     },
+
     "artifactName": "OneScriba-${version}-${os}.${ext}",
     "asar": true,
+
     "files": [
       "src/**/*",
       "package.json"
     ],
+
     "extraResources": [
       {
         "from": "assets/",
         "to": "assets/"
       }
     ],
+
     "mac": {
       "target": [
         {
@@ -47,14 +52,18 @@
       "icon": "assets/icons/icon.icns",
       "artifactName": "OneScriba-macOS.${ext}"
     },
+
     "win": {
       "target": "nsis",
       "icon": "assets/icons/icon.ico",
       "artifactName": "OneScriba-Setup.${ext}"
     },
+
     "linux": {
       "target": "AppImage",
       "icon": "assets/icons/icon.png"
-    }
+    },
+
+    "publish": null
   }
 }
