@@ -16,10 +16,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Windows installer
         run: npm run dist
@@ -40,10 +40,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "18"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build macOS dmg
         run: npm run dist
@@ -59,14 +59,14 @@ jobs:
     needs: [build-windows, build-macos]
 
     steps:
-      - name: Download built artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: dist-all
+          path: release-files
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist-all/**/*
+          files: release-files/**/* 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
